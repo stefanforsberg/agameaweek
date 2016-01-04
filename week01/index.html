@@ -115,7 +115,7 @@
 					var y = k*10 + m;
 
 					game.context.beginPath();
-					game.context.strokeStyle="rgba(255,255,255,0.2)";
+					game.context.strokeStyle="rgba(255,255,255,0.05)";
 					game.context.moveTo(game.player.x + (game.player.w / 2),game.player.y + (game.player.h / 2));
 					game.context.lineTo(this.x,this.y);
 
@@ -130,6 +130,7 @@
 					game.context.lineTo(this.x-this.crosshairSize,this.y+this.crosshairSize);
 
 					game.context.stroke();
+
 				}
 			};
 		

@@ -3,19 +3,27 @@ var game = game || {};
 game.asteroids = {
 	items: [],
 	init: function() {
-		for(var i = 0; i < 1; i++) {
-			var a = new asteroid();
-			a.init();
-			this.items.push(a)	
-		}
 		
+		game.sources.tick.scan(function (a, t) {
+			
+			if(t % 200 === 0) {
+			 	var asteroidToAdd = new asteroid();
+				asteroidToAdd.init();
+				a.items.push(asteroidToAdd)	
+			}
+			
+			// }
+
+			return a;
+		}, this).subscribe();	
 	},
 	draw: function() {
 		
 		this.items.forEach(function (i) {
 			i.draw();
 		})
-	}
+	},
+
 }
 
 var asteroid = function () {
