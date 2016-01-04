@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Title of the document</title>
+	<style type="text/css">
+		body {
+			background-color: #000012;
+		}
+
+		.container {
+			margin: auto;
+			width: 642px;
+			margin-top: 100px;
+		}
+
+		#game {
+			cursor: none;
+			border: solid 1px rgba(255,255,255,0.2);
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<canvas id="game" width="640" height="480"></canvas>
+	</div>
+
+	<script type="text/javascript" src="rx.all.min.js"></script>
+	<script type="text/javascript" src="player.js"></script>
+	<script type="text/javascript" src="asteroid.js"></script>
+	<script type="text/javascript" src="stars.js"></script>
+
+	<script>
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(start);
+
+		function start() {
+			game.settings = {
+				width: 640,
+				height: 480,
+			}
+
+			game.canvas = document.getElementById("game");
+			game.context = game.canvas.getContext("2d");
+
+			game.mapForMouseCoords = function(m) {
+				return {
+					x: (m.pageX - game.canvas.offsetLeft),
+					y: (m.pageY - game.canvas.offsetTop)
+				};
+			}
+
+			game.sources = {
+				mouseMove: Rx.Observable.fromEvent(game.canvas, 'mousemove').map(game.mapForMouseCoords),
+				mouseClick: Rx.Observable.fromEvent(game.canvas, 'click').map(game.mapForMouseCoords),
+				keyDown: Rx.Observable.fromEvent(document, 'keydown'),
+				keyUp: Rx.Observable.fromEvent(document, 'keyup'),
+				tick: Rx.Observable.interval(33)
+			}
+
+			game.collides = function colCheck(shapeA, shapeB) {
+	            // get the vectors to check against
+	            var vX = (shapeA.x + (shapeA.w / 2)) - (shapeB.x + (shapeB.w / 2)),
+	                vY = (shapeA.y + (shapeA.h / 2)) - (shapeB.y + (shapeB.h / 2)),
+	                // add the half widths and half heights of the objects
+	                hWidths = (shapeA.w / 2) + (shapeB.w / 2),
+	                hHeights = (shapeA.h / 2) + (shapeB.h / 2),
+	                colDir = null;
+
+	            // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
+	            if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
+	                // figures out on which side we are colliding (top, bottom, left, or right)
+	                var oX = hWidths - Math.abs(vX),
+	                    oY = hHeights - Math.abs(vY);
+	                if (oX >= oY) {
+	                    if (vY > 0) {
+	                        colDir = "t";
+	                        shapeA.y += oY;
+	                    } else {
+	                        colDir = "b";
+	                        shapeA.y -= oY;
+	                    }
+	                } else {
+	                    if (vX > 0) {
+	                        colDir = "l";
+	                        shapeA.x += oX;
+	                    } else {
+	                        colDir = "r";
+	                        shapeA.x -= oX;
+	                    }
+	                }
+	            }
+	            return colDir;
+	        };
+
+			var gun = {
+				x: 0,
+				y: 0,
+				crosshairSize: 4,
+				draw: function() {
+
+					var k = (this.y - game.player.y)/(this.x - game.player.x);
+					var m = this.y - (k*this.x);
+
+					var y = k*10 + m;
+
+					game.context.beginPath();
+					game.context.strokeStyle="rgba(255,255,255,0.2)";
+					game.context.moveTo(game.player.x + (game.player.w / 2),game.player.y + (game.player.h / 2));
+					game.context.lineTo(this.x,this.y);
+
+					game.context.stroke();
+
+					game.context.strokeStyle="rgba(255,255,255,0.4)";
+
+					game.context.moveTo(this.x-this.crosshairSize, this.y-this.crosshairSize);
+					game.context.lineTo(this.x+this.crosshairSize,this.y+this.crosshairSize);
+
+					game.context.moveTo(this.x+this.crosshairSize, this.y-this.crosshairSize);
+					game.context.lineTo(this.x-this.crosshairSize,this.y+this.crosshairSize);
+
+					game.context.stroke();
+				}
+			};
+		
+
+			game.sources.mouseMove.scan(function(g, m) {
+				g.x = m.x;
+				g.y = m.y;
+				return g;
+			}, gun).subscribe();
+
+			game.player.init();
+			game.asteroids.init();
+			game.stars.init();
+
+			game.sources.tick.subscribe(function () {
+				game.context.fillStyle = "#000012";
+				game.context.fillRect(0,0,game.settings.width,game.settings.height);
+				
+				game.stars.draw();
+				game.asteroids.draw();
+				gun.draw();
+				game.player.draw();
+			});	
+		}
+
+		
+
+
+
+
+
+	</script>
+
+</body>
+
+</html>
+
