@@ -63,6 +63,7 @@ asteroid.prototype.draw = function() {
 };
 
 asteroid.prototype.explode = function() {
+	game.sounds.explode.play();
 	this.exploding = true;
 	this.explodingShards = [];
 

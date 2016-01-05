@@ -68,6 +68,15 @@
 				tick: Rx.Observable.interval(33)
 			}
 
+			game.sounds = {
+				explode: new Audio('explode.mp3'),
+				song: new Audio('song.ogg')
+			}
+
+			console.log(game.sounds.song.loop);
+
+			game.sounds.song.loop = true;
+
 			game.collides = function colCheck(shapeA, shapeB) {
 	            // get the vectors to check against
 	            var vX = (shapeA.x + (shapeA.w / 2)) - (shapeB.x + (shapeB.w / 2)),
@@ -144,6 +153,8 @@
 			game.player.init();
 			game.asteroids.init();
 			game.stars.init();
+
+			game.sounds.song.play();
 
 			game.sources.tick.subscribe(function () {
 				game.context.fillStyle = "#000012";
