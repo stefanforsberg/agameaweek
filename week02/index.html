@@ -47,10 +47,9 @@
 	<script type="text/javascript" src="asteroid.js"></script>
 	<script type="text/javascript" src="stars.js"></script>
 	<script type="text/javascript" src="gun.js"></script>
+	<script type="text/javascript" src="game.js"></script>
 
 	<script>
-		var game = game || {};
-
 		function ready(fn) {
 		  if (document.readyState != 'loading'){
 		    fn();
@@ -59,144 +58,11 @@
 		  }
 		}
 
-		ready(init);
-
-		function init() {
-			game.settings = {
-				width: 640,
-				height: 480,
-				isRunning: false
-			}
-
-			game.canvas = document.getElementById("game");
-			game.context = game.canvas.getContext("2d");
-		}
+		ready(game.init());
 
 		document.getElementById("start").addEventListener("click", function () {
-
-			if(game.settings.isRunning) {
-				game.sources.gameEnded.onNext(true);
-			}
-
-			game.settings.isRunning = true;
-
-			start();
+			game.start();
 		});
-
-		function start() {
-			game.mapForMouseCoords = function(m) {
-				return {
-					x: (m.pageX - game.canvas.offsetLeft),
-					y: (m.pageY - game.canvas.offsetTop)
-				};
-			}
-
-			var gameEnded = new Rx.Subject();
-
-			game.sources = {
-				gameEnded: gameEnded,
-				mouseMove: Rx.Observable.fromEvent(game.canvas, 'mousemove').takeUntil(gameEnded).map(game.mapForMouseCoords),
-				mouseClick: Rx.Observable.fromEvent(game.canvas, 'click').takeUntil(gameEnded).map(game.mapForMouseCoords),
-				keyDown: Rx.Observable.fromEvent(document, 'keydown').takeUntil(gameEnded),
-				keyUp: Rx.Observable.fromEvent(document, 'keyup').takeUntil(gameEnded),
-				tick: Rx.Observable.interval(33).takeUntil(gameEnded)
-			}
-
-			game.sounds = {
-				explode: new Audio('explode.mp3'),
-				song: new Audio('song.ogg')
-			}
-
-			game.dispose = function () {
-				game.player.dispose();
-				game.asteroids.dispose();
-				game.gun.dispose();
-			}
-
-			game.score = {
-				score: 0,
-				scoreElement: document.querySelector(".score span"),
-				reset: function() {
-					this.score = 0;
-					this.scoreElement.innerHTML = this.score;
-				},
-				update: function() {
-					this.score++;
-					this.scoreElement.innerHTML = this.score;
-				}
-			}
-
-			game.score.reset();
-
-			game.sources.gameEnded.subscribe(function (x) {
-				game.dispose();
-				game.sounds.song.pause();
-				game.settings.isRunning = false;
-			});
-
-			game.sounds.song.loop = true;
-
-			game.collides = function colCheck(shapeA, shapeB) {
-	            // get the vectors to check against
-	            var vX = (shapeA.x + (shapeA.w / 2)) - (shapeB.x + (shapeB.w / 2)),
-	                vY = (shapeA.y + (shapeA.h / 2)) - (shapeB.y + (shapeB.h / 2)),
-	                // add the half widths and half heights of the objects
-	                hWidths = (shapeA.w / 2) + (shapeB.w / 2),
-	                hHeights = (shapeA.h / 2) + (shapeB.h / 2),
-	                colDir = null;
-
-	            // if the x and y vector are less than the half width or half height, they we must be inside the object, causing a collision
-	            if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
-	                // figures out on which side we are colliding (top, bottom, left, or right)
-	                var oX = hWidths - Math.abs(vX),
-	                    oY = hHeights - Math.abs(vY);
-	                if (oX >= oY) {
-	                    if (vY > 0) {
-	                        colDir = "t";
-	                        shapeA.y += oY;
-	                    } else {
-	                        colDir = "b";
-	                        shapeA.y -= oY;
-	                    }
-	                } else {
-	                    if (vX > 0) {
-	                        colDir = "l";
-	                        shapeA.x += oX;
-	                    } else {
-	                        colDir = "r";
-	                        shapeA.x -= oX;
-	                    }
-	                }
-	            }
-	            return colDir;
-	        };
-
-			
-
-			game.player.init();
-			game.asteroids.init();
-			game.stars.init();
-			game.gun.init();
-
-			game.sounds.song.play();
-
-			game.sources.tick.subscribe(function () {
-				game.context.fillStyle = "#000012";
-				game.context.fillRect(0,0,game.settings.width,game.settings.height);
-				
-				game.stars.draw();
-				game.asteroids.draw();
-				game.gun.draw();
-				game.player.draw();
-			});	
-		}
-
-		
-
-
-
-
-
 	</script>
 
 </body>
