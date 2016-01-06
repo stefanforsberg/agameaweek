@@ -4,6 +4,8 @@ game.asteroids = {
 	items: [],
 	init: function() {
 		
+		this.items = [];
+
 		game.sources.tick.scan(function (a, t) {
 			
 			if(t % 200 === 0) {
@@ -20,6 +22,13 @@ game.asteroids = {
 	draw: function() {
 		
 		this.items.forEach(function (i) {
+
+			if(!i.exploding) {
+				if(game.collides(i, game.player)) {
+					game.player.death();
+				}	
+			}
+
 			i.draw();
 		})
 	},

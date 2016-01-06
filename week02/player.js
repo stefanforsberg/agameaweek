@@ -1,8 +1,8 @@
 var game = game || {};
 
 game.player = {
-	x: 10,
-	y: 10,
+	x: 320,
+	y: 240,
 	w: 16,
 	h: 16,
 	vx: 0,
@@ -11,6 +11,10 @@ game.player = {
 	direction: 0,
 	draw: function() {
 		game.context.drawImage(this.baseCanvas,this.x, this.y);
+	},
+	death: function() {
+		game.sources.gameEnded.onNext(true);
+		game.sounds.explode.play();
 	},
 	init: function() {
 
@@ -47,7 +51,7 @@ game.player = {
 			} else if(k.keyCode === 65) {
 				p.direction = -1;
 			}else if(k.keyCode === 87) {
-				p.vy =-12
+				p.vy =-8
 			}
 
 			return p;
@@ -65,7 +69,7 @@ game.player = {
 		}, this).subscribe();	
 
 		game.sources.tick.scan(function (p, t)	{
-			p.vy += 0.98;
+			p.vy += 0.5;
 
 			if(Math.abs(p.vx) < 2) {
 				p.vx += p.direction * 0.1;	
@@ -78,12 +82,16 @@ game.player = {
 				p.vx += 0.01;
 			}
 
-			if(p.vy > (0.98*4)) {
-				p.vy = 0.98*4;
+			if(p.vy > (0.5*4)) {
+				p.vy = 0.5*4;
 			}
 
 			p.y += p.vy;
 			p.x += p.vx
+
+			if(p.y < -10 || p.x < -10 || (p.x > game.settings.width) || (p.y > game.settings.height)) {
+				p.death();
+			}
 
 			return p;
 		}, this).subscribe();

@@ -6,6 +6,7 @@
 	<style type="text/css">
 		body {
 			background-color: #000012;
+			color: #ffffff;
 		}
 
 		.container {
@@ -23,6 +24,13 @@
 
 <body>
 	<div class="container">
+		<p>Control rainbow robot with A/W/D. Aim with mouse and shoot with left mouse click.</p>
+		<p>1. Avoid walls</p>
+		<p>2. Avoid astorids</p>
+		<p>3. Shoot astorids</p>
+		<p>4. ???</p>
+		<p>5. Profit</p>
+		<p><input type="button" value="Click to start" id="start" /></p>
 		<canvas id="game" width="640" height="480"></canvas>
 	</div>
 
@@ -42,9 +50,9 @@
 		  }
 		}
 
-		ready(start);
+		ready(init);
 
-		function start() {
+		function init() {
 			game.settings = {
 				width: 640,
 				height: 480,
@@ -52,7 +60,13 @@
 
 			game.canvas = document.getElementById("game");
 			game.context = game.canvas.getContext("2d");
+		}
 
+		document.getElementById("start").addEventListener("click", function () {
+			start();
+		});
+
+		function start() {
 			game.mapForMouseCoords = function(m) {
 				return {
 					x: (m.pageX - game.canvas.offsetLeft),
@@ -60,12 +74,14 @@
 				};
 			}
 
+			var gameEnded = new Rx.Subject();
 			game.sources = {
-				mouseMove: Rx.Observable.fromEvent(game.canvas, 'mousemove').map(game.mapForMouseCoords),
-				mouseClick: Rx.Observable.fromEvent(game.canvas, 'click').map(game.mapForMouseCoords),
-				keyDown: Rx.Observable.fromEvent(document, 'keydown'),
-				keyUp: Rx.Observable.fromEvent(document, 'keyup'),
-				tick: Rx.Observable.interval(33)
+				gameEnded: gameEnded,
+				mouseMove: Rx.Observable.fromEvent(game.canvas, 'mousemove').takeUntil(gameEnded).map(game.mapForMouseCoords),
+				mouseClick: Rx.Observable.fromEvent(game.canvas, 'click').takeUntil(gameEnded).map(game.mapForMouseCoords),
+				keyDown: Rx.Observable.fromEvent(document, 'keydown').takeUntil(gameEnded),
+				keyUp: Rx.Observable.fromEvent(document, 'keyup').takeUntil(gameEnded),
+				tick: Rx.Observable.interval(33).takeUntil(gameEnded)
 			}
 
 			game.sounds = {
@@ -73,7 +89,11 @@
 				song: new Audio('song.ogg')
 			}
 
-			console.log(game.sounds.song.loop);
+			game.sources.gameEnded.subscribe(function (x) {
+				game.sounds.song.pause();
+
+				game.sources.mouseMove.finally(console.log("cleaning up")).singleInstance()
+			});
 
 			game.sounds.song.loop = true;
 
