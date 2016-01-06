@@ -91,6 +91,7 @@ asteroid.prototype.dispose = function() {
 };
 
 asteroid.prototype.explode = function() {
+	game.score.update();
 	game.sounds.explode.play();
 	this.exploding = true;
 	this.explodingShards = [];

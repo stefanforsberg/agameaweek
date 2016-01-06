@@ -15,6 +15,10 @@
 			margin-top: 100px;
 		}
 
+		.score {
+			text-align: right;
+		}
+
 		#game {
 			cursor: none;
 			border: solid 1px rgba(255,255,255,0.2);
@@ -30,7 +34,11 @@
 		<p>3. Shoot astorids</p>
 		<p>4. ???</p>
 		<p>5. Profit</p>
-		<p><input type="button" value="Click to start" id="start" /></p>
+		<div>
+			<div style="float: left;"><input type="button" value="Click to start" id="start" /></div>
+			<div style="float: right;" class="score">Score: <span>0</span></div>
+		</div>
+		<div style="clear: both;">&nbsp;</div>
 		<canvas id="game" width="640" height="480"></canvas>
 	</div>
 
@@ -84,6 +92,7 @@
 			}
 
 			var gameEnded = new Rx.Subject();
+
 			game.sources = {
 				gameEnded: gameEnded,
 				mouseMove: Rx.Observable.fromEvent(game.canvas, 'mousemove').takeUntil(gameEnded).map(game.mapForMouseCoords),
@@ -104,11 +113,26 @@
 				game.gun.dispose();
 			}
 
+			game.score = {
+				score: 0,
+				scoreElement: document.querySelector(".score span"),
+				reset: function() {
+					this.score = 0;
+					this.scoreElement.innerHTML = this.score;
+				},
+				update: function() {
+					this.score++;
+					this.scoreElement.innerHTML = this.score;
+				}
+			}
+
+			game.score.reset();
+
+			console.log(game.sources.score);
+
 			game.sources.gameEnded.subscribe(function (x) {
-				console.log(game.player.subscriptions);
 				game.dispose();
 				game.sounds.song.pause();
-
 				game.settings.isRunning = false;
 			});
 
