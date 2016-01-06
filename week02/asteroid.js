@@ -1,9 +1,11 @@
 var game = game || {};
 
 game.asteroids = {
+	subscriptions: [],
 	items: [],
 	init: function() {
 		
+		this.subscriptions = [];
 		this.items = [];
 
 		game.sources.tick.scan(function (a, t) {
@@ -18,6 +20,16 @@ game.asteroids = {
 
 			return a;
 		}, this).subscribe();	
+	},
+	dispose: function () {
+
+		this.subscriptions.forEach(function (s) {
+			s.dispose();
+		})
+
+		this.items.forEach(function (i) {
+			i.dispose();
+		})
 	},
 	draw: function() {
 		
@@ -49,6 +61,7 @@ var asteroid = function () {
 	this.exploding = false;
 	this.explodingShards = [];
 	this.color = "";
+	this.subscriptions = [];
 };
 
 asteroid.prototype.draw = function() {
@@ -69,6 +82,12 @@ asteroid.prototype.draw = function() {
 		}
 	}
 	
+};
+
+asteroid.prototype.dispose = function() {
+	this.subscriptions.forEach(function (s) {
+		s.dispose();
+	})
 };
 
 asteroid.prototype.explode = function() {
@@ -150,7 +169,7 @@ asteroid.prototype.init = function() {
 
 	this.seed();
 
-	game.sources.tick.scan(function (a, t)	{
+	this.subscriptions.push(game.sources.tick.scan(function (a, t)	{
 		a.angle+= a.va;
 		a.y += a.vy;
 		a.x += a.vx
@@ -160,9 +179,9 @@ asteroid.prototype.init = function() {
 		}
 
 		return a;
-	}, this).subscribe();
+	}, this).subscribe());
 
-	game.sources.mouseClick.scan(function (a, m) {
+	this.subscriptions.push(game.sources.mouseClick.scan(function (a, m) {
 
 		if(!a.exploding) {
 			if(game.collides(a, {x: m.x, y: m.y, w: 3, h: 3})) {
@@ -171,7 +190,7 @@ asteroid.prototype.init = function() {
 		}
 		
 		return a;
-	}, this).subscribe();
+	}, this).subscribe());
 };
 
 var shard = function(x, y, vx, vy, color) {

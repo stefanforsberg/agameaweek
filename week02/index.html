@@ -38,6 +38,7 @@
 	<script type="text/javascript" src="player.js"></script>
 	<script type="text/javascript" src="asteroid.js"></script>
 	<script type="text/javascript" src="stars.js"></script>
+	<script type="text/javascript" src="gun.js"></script>
 
 	<script>
 		var game = game || {};
@@ -56,6 +57,7 @@
 			game.settings = {
 				width: 640,
 				height: 480,
+				isRunning: false
 			}
 
 			game.canvas = document.getElementById("game");
@@ -63,6 +65,13 @@
 		}
 
 		document.getElementById("start").addEventListener("click", function () {
+
+			if(game.settings.isRunning) {
+				game.sources.gameEnded.onNext(true);
+			}
+
+			game.settings.isRunning = true;
+
 			start();
 		});
 
@@ -89,10 +98,18 @@
 				song: new Audio('song.ogg')
 			}
 
+			game.dispose = function () {
+				game.player.dispose();
+				game.asteroids.dispose();
+				game.gun.dispose();
+			}
+
 			game.sources.gameEnded.subscribe(function (x) {
+				console.log(game.player.subscriptions);
+				game.dispose();
 				game.sounds.song.pause();
 
-				game.sources.mouseMove.finally(console.log("cleaning up")).singleInstance()
+				game.settings.isRunning = false;
 			});
 
 			game.sounds.song.loop = true;
@@ -132,47 +149,12 @@
 	            return colDir;
 	        };
 
-			var gun = {
-				x: 0,
-				y: 0,
-				crosshairSize: 4,
-				draw: function() {
-
-					var k = (this.y - game.player.y)/(this.x - game.player.x);
-					var m = this.y - (k*this.x);
-
-					var y = k*10 + m;
-
-					game.context.beginPath();
-					game.context.strokeStyle="rgba(255,255,255,0.05)";
-					game.context.moveTo(game.player.x + (game.player.w / 2),game.player.y + (game.player.h / 2));
-					game.context.lineTo(this.x,this.y);
-
-					game.context.stroke();
-
-					game.context.strokeStyle="rgba(255,255,255,0.4)";
-
-					game.context.moveTo(this.x-this.crosshairSize, this.y-this.crosshairSize);
-					game.context.lineTo(this.x+this.crosshairSize,this.y+this.crosshairSize);
-
-					game.context.moveTo(this.x+this.crosshairSize, this.y-this.crosshairSize);
-					game.context.lineTo(this.x-this.crosshairSize,this.y+this.crosshairSize);
-
-					game.context.stroke();
-
-				}
-			};
-		
-
-			game.sources.mouseMove.scan(function(g, m) {
-				g.x = m.x;
-				g.y = m.y;
-				return g;
-			}, gun).subscribe();
+			
 
 			game.player.init();
 			game.asteroids.init();
 			game.stars.init();
+			game.gun.init();
 
 			game.sounds.song.play();
 
@@ -182,7 +164,7 @@
 				
 				game.stars.draw();
 				game.asteroids.draw();
-				gun.draw();
+				game.gun.draw();
 				game.player.draw();
 			});	
 		}

@@ -7,6 +7,7 @@ game.player = {
 	h: 16,
 	vx: 0,
 	vy: 0,
+	subscriptions: [],
 	baseCanvas: {},
 	direction: 0,
 	draw: function() {
@@ -16,7 +17,20 @@ game.player = {
 		game.sources.gameEnded.onNext(true);
 		game.sounds.explode.play();
 	},
+	dispose: function() {
+		subscriptions.forEach(function (s) {
+			s.dispose();
+		})
+	},
 	init: function() {
+
+		this.subscriptions = [];
+		this.x = 320;
+		this.y = 240;
+		this.w = 16;
+		this.h = 16;
+		this.vx = 0;
+		this.vy = 0;
 
 		this.baseCanvas = document.createElement("canvas");
 		this.baseCanvas.style.cssText = "width: 16px; height:16px;display:none;";
@@ -44,7 +58,7 @@ game.player = {
 		baseContext.fillStyle = "#BF62A6";
 		baseContext.fillRect(0,14,16,2);
 
-		game.sources.keyDown.scan(function (p, k) {
+		this.subscriptions.push(game.sources.keyDown.scan(function (p, k) {
 
 			if(k.keyCode === 68) {
 				p.direction = 1;
@@ -55,9 +69,9 @@ game.player = {
 			}
 
 			return p;
-		}, this).subscribe();
+		}, this).subscribe());
 
-		game.sources.keyUp.scan(function (p, k) {
+		this.subscriptions.push(game.sources.keyUp.scan(function (p, k) {
 
 			if(k.keyCode === 68) {
 				p.direction = 0;
@@ -66,9 +80,10 @@ game.player = {
 			}
 
 			return p;
-		}, this).subscribe();	
+		}, this).subscribe());	
 
-		game.sources.tick.scan(function (p, t)	{
+		this.subscriptions.push(game.sources.tick.scan(function (p, t)	{
+
 			p.vy += 0.5;
 
 			if(Math.abs(p.vx) < 2) {
@@ -94,7 +109,7 @@ game.player = {
 			}
 
 			return p;
-		}, this).subscribe();
+		}, this).subscribe());
 	}
 }
 
