@@ -128,8 +128,6 @@
 
 			game.score.reset();
 
-			console.log(game.sources.score);
-
 			game.sources.gameEnded.subscribe(function (x) {
 				game.dispose();
 				game.sounds.song.pause();
