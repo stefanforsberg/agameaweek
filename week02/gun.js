@@ -7,12 +7,12 @@ game.gun = {
 	crosshairSize: 4,
 	draw: function() {
 		game.context.beginPath();
-		game.context.strokeStyle="rgba(255,255,255,0.05)";
+		game.context.strokeStyle="rgba(255,255,255,0.15)";
 		game.context.moveTo(game.player.x + (game.player.w / 2),game.player.y + (game.player.h / 2));
 		game.context.lineTo(this.x,this.y);
-
 		game.context.stroke();
 
+		game.context.beginPath();
 		game.context.strokeStyle="rgba(255,255,255,0.4)";
 
 		game.context.moveTo(this.x-this.crosshairSize, this.y-this.crosshairSize);
