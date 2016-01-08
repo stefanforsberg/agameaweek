@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Witch run</title>
+	<style type="text/css">
+		body {
+			background-color: #000012;
+			color: #ffffff;
+		}
+
+		.container {
+			margin: auto;
+			width: 642px;
+			margin-top: 25px;
+		}
+
+		.score {
+			text-align: right;
+		}
+
+		#game {
+			border: solid 1px rgba(255,255,255,0.2);
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<p>Control rainbow robot with A/W/D. Aim with mouse and shoot with left mouse click.</p>
+		<p>Avoid walls and asteroids. Please shoot asteroids to increase score.</p>
+		<div>
+			<div style="float: left;"><input type="button" value="Click to start" id="start" /></div>
+			<div style="float: right;" class="score">Score: <span>0</span></div>
+		</div>
+		<div style="clear: both; height: 10px;"></div>
+		<canvas id="game" width="384" height="480"></canvas>
+
+		<img src="witch01.png" id="witch01" style="display: none;">
+		<img src="witch02.png" id="witch02" style="display: none;">
+		<img src="grass.png" id="grass" style="display: none;">
+	</div>
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+
+	<script>
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(game.init());
+
+		document.getElementById("start").addEventListener("click", function () {
+			game.start();
+		});
+	</script>
+
+</body>
+
+</html>
+
