@@ -9,6 +9,16 @@ game.init = function() {
 	}
 	game.canvas = document.getElementById("game");
 	game.context = game.canvas.getContext("2d");
+
+	game.sounds = {
+		diamond: new Audio('diamond.ogg'),
+		song: new Audio('song.ogg'),
+		death: new Audio('death.ogg')
+	}
+
+	game.subscriptions = [];
+
+	game.sounds.song.loop = true;
 	
 }
 
@@ -72,19 +82,29 @@ game.clouds = {
 
 game.start = function() {
 
+	if(game.subscriptions.length > 0) {
+		game.subscriptions.forEach(function (s) {s.dispose();});
+	}
+
+	game.subscriptions = [];
+
 	game.speed = 1;
+
+	game.sounds.song.currentTime = 0; 
+	game.sounds.song.play();
 
 	game.player.init();
 	game.terrain.init();
 	game.diamond.init();
 	game.bird.init();
+	game.obstacles.init();
 	game.clouds.init();
 
-	game.loop = Rx.Observable.interval(1000/66).subscribe(function (t) {
+	game.subscriptions.push(Rx.Observable.interval(1000/66).subscribe(function (t) {
 		game.update(t);
-	})
+	}));
 
-	Rx.Observable.fromEvent(document, 'keydown')
+	game.subscriptions.push(Rx.Observable.fromEvent(document, 'keydown')
 		.filter(function (k) {
 			return (k.keyCode === 37 || k.keyCode === 39)
 		})
@@ -105,7 +125,7 @@ game.start = function() {
 
 			return p;
 		}, game.player)
-		.subscribe();
+		.subscribe());
 }
 
 game.update = function(t) {
@@ -114,7 +134,26 @@ game.update = function(t) {
 	game.player.update(t);
 	game.diamond.update(t);
 	game.bird.update(t);
+	game.obstacles.update(t);
 	game.clouds.update(t);
+}
+
+game.obstacles = {
+	items: [],
+	init: function() {
+		this.items.push(this.add())
+	},
+	update: function (t) {
+		this.items.forEach(function (i) {
+			game.context.drawImage(document.getElementById('mountain'), i.x, i.y);
+		});
+	},
+	add: function () {
+		return {
+			x: 50,
+			y: 200,
+		}
+	}
 }
 
 game.bird = {
@@ -135,6 +174,7 @@ game.bird = {
 	update: function(t) {
 
 		if(game.collides(this,game.player)) {
+			game.over();
 			this.init();
 		} else if(this.y > (game.settings.height + 20)) {
 			this.init();
@@ -189,6 +229,7 @@ game.diamond = {
 		game.context.restore();
 
 		if(game.collides(this,game.player)) {
+			game.sounds.diamond.play();
 			this.init();
 		} else if(this.y > (game.settings.height + 20)) {
 			this.init();
@@ -283,6 +324,15 @@ game.player = {
 		}
 	}
 }
+
+game.over = function() {
+
+	game.subscriptions.forEach(function (s) { s.dispose();});
+
+	game.sounds.song.pause();
+	game.sounds.death.play();
+
+}	
 
 game.collides = function colCheck(shapeA, shapeB) {
     var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2));
