@@ -87,6 +87,11 @@ game.bird = {
 
 		game.context.drawImage(this.sprites[this.currentSprite],this.x + xdelta, this.y + ydelta);
 
+		game.context.save();
+		game.context.globalAlpha=0.2;
+		game.context.drawImage(this.sprites[this.currentSprite], this.x + xdelta - 10, this.y + ydelta + 30, 20, 24);
+		game.context.restore();		
+
 		if(t % 15 === 0) {
 			this.currentSprite++;
 			if(this.currentSprite > (this.sprites.length-1)) {
@@ -118,7 +123,12 @@ game.diamond = {
 		game.context.drawImage(this.sprites[this.currentSprite],-(this.width/2), -(this.height/2), 24, 24);
 		game.context.restore();
 
-		
+		game.context.save();
+		game.context.translate(this.x + (this.width/2) - 14, this.y + (this.height/2) + 30);
+		game.context.rotate(t*Math.PI/180);		
+		game.context.globalAlpha=0.2;
+		game.context.drawImage(this.sprites[this.currentSprite],-(this.width/2), -(this.height/2), 16, 22);		
+		game.context.restore();
 
 		if(game.collides(this,game.player)) {
 			this.init();
@@ -200,6 +210,11 @@ game.player = {
 		game.context.save();
 		game.context.imageSmoothingEnabled = false;
 		game.context.drawImage(this.sprites[this.currentSprite], this.x + xdelta, this.y + ydelta, 64, 64);
+		game.context.restore();
+
+		game.context.save();
+		game.context.globalAlpha=0.2;
+		game.context.drawImage(this.sprites[this.currentSprite], this.x + xdelta - 10, this.y + ydelta + 64, 34, 34);
 		game.context.restore();
 
 		if(t % 15 === 0) {
