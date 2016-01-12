@@ -170,7 +170,7 @@ game.diamond = {
 	currentSprite: 0,
 	init: function() {
 		this.x = 48 + game.randomNumber(0,4)*64;
-		this.y = 15;
+		this.y = -1 * game.randomNumber(50, 200);
 		this.vy = 1 + Math.random();
 	},
 	update: function(t) {
