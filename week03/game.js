@@ -12,6 +12,64 @@ game.init = function() {
 	
 }
 
+game.clouds = {
+	items: [],
+	init: function() {
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+		this.items.push(this.getCloud());
+	},
+	update: function(t) {
+		this.items.forEach(function (i) {
+			game.context.drawImage(i.image, i.x, i.y);	
+			i.y += i.vy;
+			i.x += Math.cos(Math.PI*(t + i.tDelta)*2/180) / 10;
+
+			if(i.y > (game.settings.height + 40)) {
+				i.x = game.randomNumber(0, game.settings.width);
+				i.y = -1*game.randomNumber(i.height*2, i.height*4);
+			}
+		})
+		
+	},
+	getCloud: function() {
+		var baseCanvas = document.createElement("canvas");
+		var width = game.randomNumber(90, 300);
+		var height = width*1.33;
+		baseCanvas.width = width;
+		baseCanvas.height = height;
+		var context = baseCanvas.getContext("2d");
+
+		for(var i = 0; i < 50; i++) {
+			context.beginPath();
+			context.fillStyle = "rgba(255,255,255," + Math.random()/10 + ")";
+			
+			var ry = 1.2*game.randomNumber(height/8,height/4)
+			var rx = game.randomNumber(width/8,width/4);
+
+			context.ellipse(width/2 - (width/6) + game.randomNumber(0,width/3), height / 2 - height/6 + game.randomNumber(0,height/3), rx, ry, 0, 0, Math.PI*2)
+			context.fill();
+		}
+
+		return {
+			x: game.randomNumber(0, game.settings.width),
+			y: -1*game.randomNumber(height*2, height*4),
+			vy: 0.3 + Math.random()*Math.random(),
+			tDelta: game.randomNumber(0,360),
+			width: width,
+			height: height,
+			image: baseCanvas
+		}
+	}
+}
+
 game.start = function() {
 
 	game.speed = 1;
@@ -20,6 +78,7 @@ game.start = function() {
 	game.terrain.init();
 	game.diamond.init();
 	game.bird.init();
+	game.clouds.init();
 
 	game.loop = Rx.Observable.interval(1000/66).subscribe(function (t) {
 		game.update(t);
@@ -55,6 +114,7 @@ game.update = function(t) {
 	game.player.update(t);
 	game.diamond.update(t);
 	game.bird.update(t);
+	game.clouds.update(t);
 }
 
 game.bird = {
