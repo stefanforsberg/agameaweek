@@ -131,8 +131,6 @@ game.bird = {
 		this.vy = 1+Math.random();
 		this.xdeltaSize = 1 + 25*Math.random();
 		this.ydeltaSize = 1 + 5*Math.random();
-
-		console.log(this.xdeltaSize);
 	},
 	update: function(t) {
 
