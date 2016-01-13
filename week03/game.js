@@ -29,6 +29,8 @@ game.start = function() {
 		game.subscriptions.forEach(function (s) {s.dispose();});
 	}
 
+	document.getElementById("start").style.display = "none";
+
 	game.subscriptions = [];
 
 	game.speed = 1;
@@ -371,6 +373,8 @@ game.over = function() {
 
 	game.sounds.song.pause();
 	game.sounds.death.play();
+
+	document.getElementById("start").style.display = "block";
 
 }	
 

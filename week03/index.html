@@ -5,48 +5,105 @@
 	<title>Witch run</title>
 	<style type="text/css">
 		body {
-			background-color: #000012;
-			color: #ffffff;
+			background-image: url(bg.png);
+			font-family: sans-serif;
+			color: #606060;
 		}
 
+		h1 {
+			font-family: 'Oswald', sans-serif;
+			color: #7560FF;
+			text-transform: uppercase;
+			font-size: 48px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+
+
 		.container {
-			margin: auto;
-			width: 642px;
 			margin-top: 25px;
+			margin-left: 50px;
+			width: 950px;
+
+		}
+
+		.content {
+			float: left;
+			width: 500px;
+			padding: 8px;
+			border-radius: 3px;
+			background-color: rgba(255,255,255,0.5);
+			min-height: 484px;
+		}
+
+		.content img {
+			vertical-align: middle;
+		}
+
+		.game {
+			position: relative;
+			float: right;
+			padding: 8px;
+			border-radius: 3px;
+			background-color: rgba(255,255,255,0.5);
+			min-height: 400px;
+		}
+
+		.start-button {
+			position: absolute;
+			left: 125px;
+			top: 220px;
+
 		}
 
 		.score {
 			text-align: right;
 		}
 
-		#game {
-			border: solid 1px rgba(255,255,255,0.2);
+		#start {
+			border: solid 1px #ffffff;
+    		background-color: rgba(255,255,255,0.6);
+    		color: #2F5C72;
+    		text-transform: uppercase;
+    		font-family: 'Oswald', sans-serif;
+    		padding: 12px 40px;
 		}
 	</style>
+
+	<link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
 	<div class="container">
-		<p>Control rainbow robot with A/W/D. Aim with mouse and shoot with left mouse click.</p>
-		<p>Avoid walls and asteroids. Please shoot asteroids to increase score.</p>
-		<div>
-			<div style="float: left;"><input type="button" value="Click to start" id="start" /></div>
-			<div style="float: right;" class="score">Score: <span>0</span></div>
-		</div>
-		<div style="clear: both; height: 10px;"></div>
-		<canvas id="game" width="384" height="480"></canvas>
 
-		<img src="witch01.png" id="witch01" style="display: none;">
+		<div class="content">
+			<h1>Witch run</h1>
+			<p><img src="witch01.png" id="witch01"> Use left and right arrow to steer.</p>
+			<p><img src="diamond.png" id="diamond01"> Collect diamonds to increase score </p>
+			<p><img src="mountain.png" id="mountain"> Stay clear of obstacles to avoid death</p>
+			<p><img src="bird.png" id="bird01"> Avoid the Irbd (name is bird rearranged. That's how you know they are evil) </p>
+		</div>
+
+		<div class="game">
+
+
+			<div class="start-button"><input type="button" value="Click to start" id="start" /></div>
+
+			<canvas id="game" width="384" height="480"></canvas>
+
+		</div>
+
+
+
+		
 		<img src="witch02.png" id="witch02" style="display: none;">
 		<img src="grass.png" id="grass" style="display: none;">
 		<img src="water.png" id="water" style="display: none;">
 		<img src="potion.png" id="potion" style="display: none;">
-		<img src="mountain.png" id="mountain" style="display: none;">
-		<img src="diamond.png" id="diamond01" style="display: none;">
 		<img src="diamond02.png" id="diamond02" style="display: none;">
 		<img src="diamond03.png" id="diamond03" style="display: none;">
 		<img src="diamond04.png" id="diamond04" style="display: none;">
-		<img src="bird.png" id="bird01" style="display: none;">
+		
 		<img src="bird02.png" id="bird02" style="display: none;">
 		<img src="bird03.png" id="bird03" style="display: none;">
 	</div>
