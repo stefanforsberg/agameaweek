@@ -76,10 +76,10 @@ game.start = function() {
 game.update = function(t) {
 	game.context.clearRect(0,0,game.settings.width,game.settings.height);
 	game.terrain.update(t);
-	game.player.update(t);
 	game.obstacles.update(t);
 	game.diamond.update(t);
 	game.bird.update(t);
+	game.player.update(t);
 	game.clouds.update(t);
 }
 
