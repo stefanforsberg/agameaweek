@@ -22,9 +22,125 @@ game.init = function() {
 	
 }
 
+
+game.start = function() {
+
+	if(game.subscriptions.length > 0) {
+		game.subscriptions.forEach(function (s) {s.dispose();});
+	}
+
+	game.subscriptions = [];
+
+	game.speed = 1;
+
+	game.sounds.song.currentTime = 0; 
+	game.sounds.song.play();
+
+	game.player.init();
+	game.terrain.init();
+	game.diamond.init();
+	game.bird.init();
+	game.obstacles.init();
+	game.clouds.init();
+
+	game.subscriptions.push(Rx.Observable.interval(1000/66).subscribe(function (t) {
+		game.update(t);
+	}));
+
+	game.subscriptions.push(Rx.Observable.fromEvent(document, 'keydown')
+		.filter(function (k) {
+			return (k.keyCode === 37 || k.keyCode === 39)
+		})
+		.map(function (k) {
+			return k.keyCode
+		})
+		.scan(function (p, k) {
+			if(k === 37) {
+				if(p.x > 32) {
+					p.x-= 64;
+				}
+			} else {
+				if(p.x < 288) {
+					p.x+= 64;	
+				}
+				
+			}
+
+			return p;
+		}, game.player)
+		.subscribe());
+}
+
+game.update = function(t) {
+	game.context.clearRect(0,0,game.settings.width,game.settings.height);
+	game.terrain.update(t);
+	game.player.update(t);
+	game.obstacles.update(t);
+	game.diamond.update(t);
+	game.bird.update(t);
+	game.clouds.update(t);
+}
+
+game.obstacles = {
+	items: [],
+	init: function() {
+		this.items = [];
+		this.items.push(this.add(0))
+		this.items.push(this.add(game.settings.height/2))
+	},
+	update: function (t) {
+		for(var i = this.items.length - 1; i >= 0; i--) {
+
+			if(this.items[i].items[0].y > ((game.settings.height + 40))) {
+				this.items.splice(i, 1);
+				this.items.push(this.add(0));
+				continue;
+			}
+
+			this.items[i].items.forEach(function (o) {
+				if(game.collides(o, game.player)) {
+					game.over();
+				}
+				game.context.drawImage(document.getElementById('mountain'), o.x+16, o.y);
+				o.y++;
+
+				if(o.y > (game.settings.height + 40)) {
+
+				}
+			});
+
+			
+		};
+	},
+	add: function (ydelta) {
+
+		var items = [];
+
+		var numberOfObstacles = game.randomNumber(1,4);
+
+		var possiblePositions = [1,2,3,4,5];
+
+		var obstaclePositions = [];
+
+		for(var i = 0; i < numberOfObstacles; i++) {
+			var index = Math.floor(Math.random()*possiblePositions.length);
+			var position = possiblePositions[index];
+
+			items.push({ x: 32 + 64*(position-1), y: -40 - ydelta, width:32, height: 32});
+
+			possiblePositions.splice(index, 1);
+		}
+
+		return {
+			items: items
+		}
+	}
+}
+
 game.clouds = {
 	items: [],
 	init: function() {
+		this.items = [];
 		this.items.push(this.getCloud());
 		this.items.push(this.getCloud());
 		this.items.push(this.getCloud());
@@ -80,81 +196,6 @@ game.clouds = {
 	}
 }
 
-game.start = function() {
-
-	if(game.subscriptions.length > 0) {
-		game.subscriptions.forEach(function (s) {s.dispose();});
-	}
-
-	game.subscriptions = [];
-
-	game.speed = 1;
-
-	game.sounds.song.currentTime = 0; 
-	game.sounds.song.play();
-
-	game.player.init();
-	game.terrain.init();
-	game.diamond.init();
-	game.bird.init();
-	game.obstacles.init();
-	game.clouds.init();
-
-	game.subscriptions.push(Rx.Observable.interval(1000/66).subscribe(function (t) {
-		game.update(t);
-	}));
-
-	game.subscriptions.push(Rx.Observable.fromEvent(document, 'keydown')
-		.filter(function (k) {
-			return (k.keyCode === 37 || k.keyCode === 39)
-		})
-		.map(function (k) {
-			return k.keyCode
-		})
-		.scan(function (p, k) {
-			if(k === 37) {
-				if(p.x > 32) {
-					p.x-= 64;
-				}
-			} else {
-				if(p.x < 288) {
-					p.x+= 64;	
-				}
-				
-			}
-
-			return p;
-		}, game.player)
-		.subscribe());
-}
-
-game.update = function(t) {
-	game.context.clearRect(0,0,game.settings.width,game.settings.height);
-	game.terrain.update(t);
-	game.player.update(t);
-	game.diamond.update(t);
-	game.bird.update(t);
-	game.obstacles.update(t);
-	game.clouds.update(t);
-}
-
-game.obstacles = {
-	items: [],
-	init: function() {
-		this.items.push(this.add())
-	},
-	update: function (t) {
-		this.items.forEach(function (i) {
-			game.context.drawImage(document.getElementById('mountain'), i.x, i.y);
-		});
-	},
-	add: function () {
-		return {
-			x: 50,
-			y: 200,
-		}
-	}
-}
 
 game.bird = {
 	x: 1,
@@ -175,7 +216,6 @@ game.bird = {
 
 		if(game.collides(this,game.player)) {
 			game.over();
-			this.init();
 		} else if(this.y > (game.settings.height + 20)) {
 			this.init();
 		}
