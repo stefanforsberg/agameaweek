@@ -1,6 +1,19 @@
 var game = game || {};
 
 game.init = function() {
+
+	// Ellipse polyfill borrowed from https://github.com/google/canvas-5-polyfill/blob/master/canvas.js
+	if (CanvasRenderingContext2D.prototype.ellipse == undefined) {
+  		CanvasRenderingContext2D.prototype.ellipse = function(x, y, radiusX, radiusY, rotation, startAngle, endAngle, antiClockwise) {
+	    	this.save();
+		    this.translate(x, y);
+		    this.rotate(rotation);
+		    this.scale(radiusX, radiusY);
+		    this.arc(0, 0, 1, startAngle, endAngle, antiClockwise);
+		    this.restore();
+	  }
+	}
+
 	game.settings = {
 		width: 384,
 		height: 480,
@@ -20,6 +33,7 @@ game.init = function() {
 
 	game.sounds.song.loop = true;
 	
+	game.score = 0;
 }
 
 
@@ -32,6 +46,9 @@ game.start = function() {
 	document.getElementById("start").style.display = "none";
 
 	game.subscriptions = [];
+
+	game.score = 0;
+	game.updateScore();
 
 	game.speed = 1;
 
@@ -272,6 +289,8 @@ game.diamond = {
 
 		if(game.collides(this,game.player)) {
 			game.sounds.diamond.play();
+			game.score++;
+			game.updateScore();
 			this.init();
 		} else if(this.y > (game.settings.height + 20)) {
 			this.init();
@@ -375,8 +394,11 @@ game.over = function() {
 	game.sounds.death.play();
 
 	document.getElementById("start").style.display = "block";
-
 }	
+
+game.updateScore = function() {
+	document.querySelector(".score span").innerHTML = game.score;
+}
 
 game.collides = function colCheck(shapeA, shapeB) {
     var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2));

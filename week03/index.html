@@ -57,7 +57,20 @@
 		}
 
 		.score {
-			text-align: right;
+			position: absolute;
+			left: 40px;
+			top: 14px;
+			font-family: Arial;
+			font-weight: bold;
+		}
+
+		.score img {
+			vertical-align: middle;
+		}
+
+		.score span {
+			margin-left: 3px;
+			vertical-align: middle;
 		}
 
 		#start {
@@ -88,6 +101,8 @@
 
 
 			<div class="start-button"><input type="button" value="Click to start" id="start" /></div>
+
+			<div class="score"><img src="diamond.png"><span>0</span></div>
 
 			<canvas id="game" width="384" height="480"></canvas>
 
