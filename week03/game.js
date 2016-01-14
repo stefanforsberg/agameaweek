@@ -50,7 +50,7 @@ game.start = function() {
 	game.score = 0;
 	game.updateScore();
 
-	game.speed = 1;
+	game.speed = 0;
 
 	game.sounds.song.currentTime = 0; 
 	game.sounds.song.play();
@@ -91,6 +91,15 @@ game.start = function() {
 }
 
 game.update = function(t) {
+
+	if(t % 100 === 0) {
+		if(game.speed > 3) {
+			game.speed += 0.05;	
+		} else {
+			game.speed += 0.1;	
+		}
+	}
+
 	game.context.clearRect(0,0,game.settings.width,game.settings.height);
 	game.terrain.update(t);
 	game.obstacles.update(t);
@@ -121,11 +130,7 @@ game.obstacles = {
 					game.over();
 				}
 				game.context.drawImage(document.getElementById('mountain'), o.x+16, o.y);
-				o.y++;
-
-				if(o.y > (game.settings.height + 40)) {
-
-				}
+				o.y += 1 + game.speed;
 			});
 
 			
@@ -135,7 +140,7 @@ game.obstacles = {
 
 		var items = [];
 
-		var numberOfObstacles = game.randomNumber(1,4);
+		var numberOfObstacles = game.randomNumber(1,3);
 
 		var possiblePositions = [1,2,3,4,5];
 
@@ -174,7 +179,7 @@ game.clouds = {
 	update: function(t) {
 		this.items.forEach(function (i) {
 			game.context.drawImage(i.image, i.x, i.y);	
-			i.y += i.vy;
+			i.y += i.vy + game.speed;
 			i.x += Math.cos(Math.PI*(t + i.tDelta)*2/180) / 10;
 
 			if(i.y > (game.settings.height + 40)) {
@@ -206,7 +211,7 @@ game.clouds = {
 		return {
 			x: game.randomNumber(0, game.settings.width),
 			y: -1*game.randomNumber(height*2, height*4),
-			vy: 0.3 + Math.random()*Math.random(),
+			vy: 0.3 + Math.random()*Math.random() + game.speed,
 			tDelta: game.randomNumber(0,360),
 			width: width,
 			height: height,
@@ -256,7 +261,7 @@ game.bird = {
 			}	
 		}
 
-		this.y += this.vy;
+		this.y += this.vy + game.speed;
 	}
 }
 
@@ -303,7 +308,7 @@ game.diamond = {
 			}	
 		}
 
-		this.y += this.vy;
+		this.y += this.vy + game.speed;
 	}
 }
 
@@ -344,7 +349,7 @@ game.terrain = {
 
 		game.context.drawImage(this.baseCanvas, 0, this.y);
 
-		this.y += game.speed;
+		this.y += 1 + game.speed;
 		if(this.y > -32) {
 			this.y = -64;
 		}
