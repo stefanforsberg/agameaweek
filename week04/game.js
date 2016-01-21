@@ -34,7 +34,6 @@ game.initLevel = function(level) {
     canvas.height = game.height;
     canvas.style.zIndex   = 1;
 
-    // canvas.style.border   = "1px solid";
     game.container.appendChild(canvas)
 
 	var fog = document.createElement('canvas');
@@ -42,8 +41,6 @@ game.initLevel = function(level) {
     fog.width  = game.width;
     fog.height = game.height;
     fog.style.zIndex   = 1;
-    // canvas.style.position = "absolute";
-    // canvas.style.border   = "1px solid";
     game.container.appendChild(fog)
 
     game.init();
@@ -51,38 +48,93 @@ game.initLevel = function(level) {
     resize();
 }
 
+game.fog = {
+	
+	r1: 4,
+	r2: 40,
+	init: function() {
+		this.canvas = document.getElementById("fog")	
+		this.context = this.canvas.getContext("2d");
+		this.activated = false;
+	},
+	draw: function() {
+		if(!this.activated) {
+			return;
+		}
+
+	    var coords = game.tileToCoord(game.player.x - 1, game.player.y -1);
+
+	  	var x = coords.x + (game.tileSize*1.5 + game.tilePadding);
+	  	var y = coords.y + (game.tileSize*1.5 + game.tilePadding);
+
+	    var radGrd = game.context.createRadialGradient( x, y, this.r1, x, y, this.r2 );
+	    radGrd.addColorStop(0, 'rgba( 255, 0, 0,  .7 )' );
+	    radGrd.addColorStop(.4, 'rgba( 255, 0, 0, .3 )' );
+	    radGrd.addColorStop(1, 'rgba( 255, 0, 0,  0 )' );
+
+	  	game.context.save();
+	  	game.context.globalCompositeOperation = 'destination-out';
+	   
+	    game.context.fillStyle = radGrd;
+	    game.context.fillRect(x - this.r2, y - this.r2, this.r2*2, this.r2*2 );
+
+	    game.context.restore();
+
+		this.context.globalCompositeOperation = 'source-over';
+	    this.context.clearRect( 0, 0, game.width, game.height );
+	    this.context.fillStyle = "rgba( 0, 0, 0, .99 )";
+	    this.context.fillRect ( 0, 0, game.width, game.height );
+
+	    var radGrd = game.fog.context.createRadialGradient( x, y, this.r1, x, y, this.r2 );
+	    radGrd.addColorStop(  0, 'rgba( 0, 0, 0,  1 )' );
+	    radGrd.addColorStop( .8, 'rgba( 0, 0, 0, .6 )' );
+	    radGrd.addColorStop(  1, 'rgba( 0, 0, 0,  0 )' );
+
+	    this.context.globalCompositeOperation = 'destination-out';
+	    this.context.fillStyle = radGrd;
+	    this.context.fillRect( x - this.r2, y - this.r2, this.r2*2, this.r2*2 );
+	}
+}
+
 game.init = function() {
 
 	game.canvas = document.getElementById("game");
 	game.context = game.canvas.getContext("2d");
 
-	game.fog = {
-		canvas: document.getElementById("fog")
-	}
-
-	game.fog.context = game.fog.canvas.getContext("2d");
-
-	// game.tileSize = 16;
-	// game.tileWidth = 16;
-	// game.tileHeight = 10;
-	// game.tilePadding = 3;
-
-	// game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
-	// game.height = game.tileSize * game.tileHeight + game.tilePadding*(game.tileWidth-1);
-
 	game.maze.init();
+
+	game.fog.init();
 
 	game.player.init(game.maze.startPosition.x, game.maze.startPosition.y);
 
 	game.update();
 
-	if(game.streamSubscription) {
-		game.streamSubscription.dispose();
-	}
+	Rx.Observable
+		.timer(500, 1000)
+		.map(i => 5 - i)
+		.take(6)
+		.subscribe(function(i) {
+			game.update();
+	  		game.context.font = "30px Arial";
+			game.context.textAlign="center"; 
+			game.context.fillText(i,game.width/2,game.height/2 + 15); 
+		}, 
+		function (err) {
+		},
+		function () {
+			game.fog.activated = true;
 
-	game.streamSubscription = game.player.playerStream.subscribe(function () {
-		game.update();
-	})
+			game.update();
+
+			if(game.streamSubscription) {
+				game.streamSubscription.dispose();
+			}
+
+			game.streamSubscription = game.player.playerStream.subscribe(function () {
+				game.update();
+			})
+	}
+);
 }
 
 game.maze = {
@@ -119,8 +171,6 @@ game.maze = {
 			for(var x = 0; x < game.tileWidth; x++) {
 
 				var currentCell = this.maze.cells[y][x];
-
-
 
 				context.beginPath();
 
@@ -193,41 +243,7 @@ game.update = function(ts) {
     
     game.maze.draw();
 
-    var coords = game.tileToCoord(game.player.x - 1, game.player.y -1);
-
-    var r1 = 4
-  	var r2 = 40
-
-
-  	var x = coords.x + (game.tileSize*1.5 + game.tilePadding);
-  	var y = coords.y + (game.tileSize*1.5 + game.tilePadding);
-
-    var radGrd = game.context.createRadialGradient( x, y, r1, x, y, r2 );
-    radGrd.addColorStop(0, 'rgba( 255, 0, 0,  .7 )' );
-    radGrd.addColorStop(.4, 'rgba( 255, 0, 0, .3 )' );
-    radGrd.addColorStop(1, 'rgba( 255, 0, 0,  0 )' );
-
-  	game.context.save();
-  	game.context.globalCompositeOperation = 'destination-out';
-   
-    game.context.fillStyle = radGrd;
-    game.context.fillRect(x - r2, y - r2, r2*2, r2*2 );
-
-    game.context.restore();
-
-	// game.fog.context.globalCompositeOperation = 'source-over';
- //    game.fog.context.clearRect( 0, 0, game.width, game.height );
- //    game.fog.context.fillStyle = "rgba( 0, 0, 0, .99 )";
- //    game.fog.context.fillRect ( 0, 0, game.width, game.height );
-
- //    var radGrd = game.fog.context.createRadialGradient( x, y, r1, x, y, r2 );
- //    radGrd.addColorStop(  0, 'rgba( 0, 0, 0,  1 )' );
- //    radGrd.addColorStop( .8, 'rgba( 0, 0, 0, .6 )' );
- //    radGrd.addColorStop(  1, 'rgba( 0, 0, 0,  0 )' );
-
- //    game.fog.context.globalCompositeOperation = 'destination-out';
- //    game.fog.context.fillStyle = radGrd;
- //    game.fog.context.fillRect( x - r2, y - r2, r2*2, r2*2 );
+    game.fog.draw();
     
 	game.player.draw();
 
@@ -335,8 +351,11 @@ function resize() {
 	
 	game.canvas.style.width = width+'px';
 	game.canvas.style.height = height+'px';
-
     game.canvas.style.marginLeft = "-" +  width /2 +  "px";
+
+    game.fog.canvas.style.width = width+'px';
+	game.fog.canvas.style.height = height+'px';
+    game.fog.canvas.style.marginLeft = "-" +  width /2 +  "px";
 }
 
 // window.addEventListener('load', resize, false);
