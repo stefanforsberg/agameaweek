@@ -18,12 +18,15 @@
 			margin-bottom: 10px;
 		}
 
-
 		.container {
-			margin-top: 25px;
-			margin-left: 50px;
-			width: 950px;
+			position: relative;
+		}
 
+		.container canvas {
+			border: solid 1px red;
+			position: absolute;
+			left: 0px;
+			top: 0px;
 		}
 
 		.content {
@@ -81,9 +84,7 @@
     		padding: 12px 40px;
 		}
 
-		#game {
-			border: solid 3px black;
-		}
+		
 	</style>
 
 	<link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
@@ -91,11 +92,8 @@
 
 <body>
 	<div class="container">
-	<canvas id="game" width="604" height="477"></canvas>
-		<img src="wall_left.png" id="wall_left">
-		<img src="wall_top.png" id="wall_top">
-		<img src="wall_right.png" id="wall_right">
-		<img src="wall_bottom.png" id="wall_bottom">
+		<canvas id="game" width="604" height="477"></canvas>
+		<canvas id="fog" width="604" height="477"></canvas>
 	</div>
 
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
