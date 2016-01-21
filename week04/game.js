@@ -12,8 +12,8 @@ game.init = function() {
 	game.fog.context = game.fog.canvas.getContext("2d");
 
 	game.tileSize = 16;
-	game.tileWidth = 32;
-	game.tileHeight = 24;
+	game.tileWidth = 16;
+	game.tileHeight = 10;
 	game.tilePadding = 3;
 
 	game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
@@ -42,23 +42,30 @@ game.maze = {
 		this.baseCanvas = document.createElement("canvas");
 		this.baseCanvas.width = game.width;
 		this.baseCanvas.height = game.height;
-		var context = this.baseCanvas.getContext("2d");
 
+		this.endPosition = {
+		    x: Math.floor(Math.random()*game.tileWidth),
+    		y: Math.floor(Math.random()*game.tileHeight),
+		}
+
+		var context = this.baseCanvas.getContext("2d");
 
 
 		this.maze = newMaze(game.tileWidth,game.tileHeight);
 
 		this.startPosition = this.maze.startPosition;
 
-		var colors = ["#454545", "#414141", "#484848", "#494949"]
+		var colors = ["#383838", "#3b3b3b", "#3f3f3f", "#353535"]
 
-		context.fillStyle = "#454545";
+		context.fillStyle = "#383838";
 		context.fillRect(0, 0, game.width, game.height);
 
 		for(var y = 0; y < game.tileHeight; y ++) {
 			for(var x = 0; x < game.tileWidth; x++) {
 
 				var currentCell = this.maze.cells[y][x];
+
+
 
 				context.beginPath();
 
@@ -99,6 +106,14 @@ game.maze = {
 				context.stroke();
 			}
 		}
+
+		var coords = game.tileToCoord(this.endPosition.x, this.endPosition.y);
+
+		context.fillStyle = "#000000";
+		context.fillRect(coords.x + 2, coords.y + 2, game.tileSize - 4, game.tileSize - 4);
+
+
+
 	},
 	canGoTo: function(x, y, dir) {
 		return this.maze.cells[y][x][4].indexOf(dir) > -1;
@@ -167,6 +182,7 @@ game.player = {
 	x: 0,
 	y: 0,
 	visited: {},
+	colors: ["rgba(120,197,214, 0.2)", "rgba(69,155,168, 0.2)", "rgba(121,194,103, 0.2)", "rgba(197,214,71, 0.2)", "rgba(245,214,61, 0.2)", "rgba(242,140,51, 0.2)", "rgba(232,104,162, 0.2)", "rgba(191,98,166, 0.2)"],
 	playerStream: {},
 	init: function(x, y) {
 		this.newPosition(x,y);
@@ -203,30 +219,38 @@ game.player = {
 	draw: function() {
 		var visited = this.visited;
 
-		// Object.keys(this.visited).forEach(function (k) {
-		// 	var cell = visited[k];
-		// 	console.log(cell);
-		// 	game.context.fillStyle = cell.color;
-		// 	var coords = game.tileToCoord(cell.x, cell.y);
-		// 	game.context.fillRect(coords.x, coords.y, game.tileSize, game.tileSize);
-		// })
+		var i = 0;
+		var self = this;		
 
-		game.context.fillStyle = "#ff7700";
+		Object.keys(this.visited).forEach(function (k) {
+			var cell = visited[k];
+			game.context.fillStyle = self.colors[i];
+			var coords = game.tileToCoord(cell.x, cell.y);
+			game.context.fillRect(coords.x + 1, coords.y + 1, game.tileSize - 2, game.tileSize - 2);
+
+			i++;
+
+			if(i >= self.colors.length) {
+				i = 0;
+			}
+		})
+
+		game.context.fillStyle = "#FFFFFF";
 		var coords = game.tileToCoord(this.x, this.y);
-		game.context.fillRect(coords.x, coords.y, game.tileSize, game.tileSize);
+		game.context.fillRect(coords.x + 3, coords.y + 3, game.tileSize - 6, game.tileSize - 6);
 	},
 	newPosition: function(x, y) {
 		this.x = x;
 		this.y = y;
 
-		var colors = ["rgba(200,50,120, 0.2)", "rgba(200,189,130, 0.2)", "rgba(87,50,120, 0.2)", "rgba(23,50,233, 0.2)"]
+		
 
 		var key = "k-" + x + "-" + y;
 
 		if(this.visited[key]) {
 			console.log("yes");
 		} else {
-			this.visited[key] = {x: x, y: y, color: colors[Math.floor(Math.random()*colors.length)]};	
+			this.visited[key] = {x: x, y: y};	
 		}
 	}
 }

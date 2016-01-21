@@ -61,6 +61,7 @@ function newMaze(x, y) {
             currentCell = path.pop();
         }
     }
+
     return {
         startPosition: startPosition,
         cells: cells
