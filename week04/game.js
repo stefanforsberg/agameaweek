@@ -1,5 +1,57 @@
 var game = game || {};
 
+game.initLevel = function(level) {
+
+	if(game.keyStream) {
+		console.log(game.keyStream);
+		game.keyStream.dispose();
+	}
+
+	game.level = level;
+
+	game.container = document.querySelector('.container');
+	game.container.innerHTML = "";
+
+	game.tileSize = 16;
+	game.tilePadding = 3;
+
+	if(game.level === 1) {
+		game.tileWidth = 6
+		game.tileHeight = 4
+	} else if(game.level === 2) {
+		game.tileWidth = 10;
+		game.tileHeight = 8;
+	} else if(game.level === 3) {
+		game.tileWidth = 16;
+		game.tileHeight = 10;
+	}
+
+	game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
+	game.height = game.tileSize * game.tileHeight + game.tilePadding*(game.tileHeight-1);
+
+	var canvas = document.createElement('canvas');
+    canvas.id     = "game";
+    canvas.width  = game.width;
+    canvas.height = game.height;
+    canvas.style.zIndex   = 1;
+
+    // canvas.style.border   = "1px solid";
+    game.container.appendChild(canvas)
+
+	var fog = document.createElement('canvas');
+    fog.id     = "fog";
+    fog.width  = game.width;
+    fog.height = game.height;
+    fog.style.zIndex   = 1;
+    // canvas.style.position = "absolute";
+    // canvas.style.border   = "1px solid";
+    game.container.appendChild(fog)
+
+    game.init();
+
+    resize();
+}
+
 game.init = function() {
 
 	game.canvas = document.getElementById("game");
@@ -11,13 +63,13 @@ game.init = function() {
 
 	game.fog.context = game.fog.canvas.getContext("2d");
 
-	game.tileSize = 16;
-	game.tileWidth = 16;
-	game.tileHeight = 10;
-	game.tilePadding = 3;
+	// game.tileSize = 16;
+	// game.tileWidth = 16;
+	// game.tileHeight = 10;
+	// game.tilePadding = 3;
 
-	game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
-	game.height = game.tileSize * game.tileHeight + game.tilePadding*(game.tileWidth-1);
+	// game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
+	// game.height = game.tileSize * game.tileHeight + game.tilePadding*(game.tileWidth-1);
 
 	game.maze.init();
 
@@ -25,7 +77,11 @@ game.init = function() {
 
 	game.update();
 
-	game.player.playerStream.subscribe(function () {
+	if(game.streamSubscription) {
+		game.streamSubscription.dispose();
+	}
+
+	game.streamSubscription = game.player.playerStream.subscribe(function () {
 		game.update();
 	})
 }
@@ -178,13 +234,17 @@ game.update = function(ts) {
 
 }
 
+game.nextLevel = function() {
+	game.initLevel((game.level + 1))
+}
+
 game.player = {
 	x: 0,
 	y: 0,
 	visited: {},
 	colors: ["rgba(120,197,214, 0.2)", "rgba(69,155,168, 0.2)", "rgba(121,194,103, 0.2)", "rgba(197,214,71, 0.2)", "rgba(245,214,61, 0.2)", "rgba(242,140,51, 0.2)", "rgba(232,104,162, 0.2)", "rgba(191,98,166, 0.2)"],
-	playerStream: {},
 	init: function(x, y) {
+
 		this.newPosition(x,y);
 		this.playerStream = Rx.Observable.fromEvent(document, 'keydown')
 		.filter(function (k) {
@@ -243,7 +303,9 @@ game.player = {
 		this.x = x;
 		this.y = y;
 
-		
+		if(this.x === game.maze.endPosition.x && this.y === game.maze.endPosition.y) {
+			game.nextLevel();
+		}
 
 		var key = "k-" + x + "-" + y;
 
@@ -275,6 +337,8 @@ function resize() {
 	
 	game.canvas.style.width = width+'px';
 	game.canvas.style.height = height+'px';
+
+    game.canvas.style.marginLeft = "-" +  width /2 +  "px";
 }
 
 // window.addEventListener('load', resize, false);

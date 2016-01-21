@@ -20,13 +20,13 @@
 
 		.container {
 			position: relative;
+			margin: 0 auto;
 		}
 
 		.container canvas {
-			border: solid 1px red;
 			position: absolute;
-			left: 0px;
 			top: 0px;
+			left: 50%;
 		}
 
 		.content {
@@ -92,8 +92,7 @@
 
 <body>
 	<div class="container">
-		<canvas id="game" width="604" height="477"></canvas>
-		<canvas id="fog" width="604" height="477"></canvas>
+
 	</div>
 
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
@@ -112,7 +111,7 @@
 		  }
 		}
 
-		ready(game.init());
+		ready(game.initLevel(1));
 
 
 	</script>
