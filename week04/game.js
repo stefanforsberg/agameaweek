@@ -3,7 +3,6 @@ var game = game || {};
 game.initLevel = function(level) {
 
 	if(game.keyStream) {
-		console.log(game.keyStream);
 		game.keyStream.dispose();
 	}
 
@@ -244,8 +243,8 @@ game.player = {
 	visited: {},
 	colors: ["rgba(120,197,214, 0.2)", "rgba(69,155,168, 0.2)", "rgba(121,194,103, 0.2)", "rgba(197,214,71, 0.2)", "rgba(245,214,61, 0.2)", "rgba(242,140,51, 0.2)", "rgba(232,104,162, 0.2)", "rgba(191,98,166, 0.2)"],
 	init: function(x, y) {
-
-		this.newPosition(x,y);
+		this.visited = {};
+		this.newPosition(x, y);
 		this.playerStream = Rx.Observable.fromEvent(document, 'keydown')
 		.filter(function (k) {
 			return (k.keyCode === 37 || k.keyCode === 39 || k.keyCode === 38 || k.keyCode === 40)
@@ -305,13 +304,12 @@ game.player = {
 
 		if(this.x === game.maze.endPosition.x && this.y === game.maze.endPosition.y) {
 			game.nextLevel();
+			return;
 		}
 
 		var key = "k-" + x + "-" + y;
 
-		if(this.visited[key]) {
-			console.log("yes");
-		} else {
+		if(!this.visited[key]) {
 			this.visited[key] = {x: x, y: y};	
 		}
 	}
