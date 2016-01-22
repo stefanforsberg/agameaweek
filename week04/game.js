@@ -2,8 +2,8 @@ var game = game || {};
 
 game.initLevel = function(level) {
 
-	if(game.keyStream) {
-		game.keyStream.dispose();
+	if(game.streamSubscription) {
+		game.streamSubscription.dispose();
 	}
 
 	game.level = level;
@@ -125,10 +125,6 @@ game.init = function() {
 			game.fog.activated = true;
 
 			game.update();
-
-			if(game.streamSubscription) {
-				game.streamSubscription.dispose();
-			}
 
 			game.streamSubscription = game.player.playerStream.subscribe(function () {
 				game.update();
