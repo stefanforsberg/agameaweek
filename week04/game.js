@@ -1,5 +1,29 @@
 var game = game || {};
 
+game.load = function() {
+
+	game.sounds = [];
+
+	game.sounds[1] = new Howl({
+  		urls: ['level1.ogg'],
+  		loop: true,
+  		onload: function() {
+  			game.sounds[2] =new Howl({
+		  		urls: ['level2.ogg'],
+		  		loop: true,
+		  		onload: function() {
+		  			game.sounds[3] =new Howl({
+				  		urls: ['level3.ogg'],
+				  		loop: true
+		  			})
+  				}
+			})
+		}
+	})
+
+	game.initLevel(1);
+}
+
 game.initLevel = function(level) {
 
 	if(game.streamSubscription) {
@@ -7,6 +31,19 @@ game.initLevel = function(level) {
 	}
 
 	game.level = level;
+
+	game.sounds[game.level].fade(0, 1, 5000);
+	game.sounds[game.level].play();
+
+	if(game.level > 1) {
+		game.sounds[game.level].pos(game.sounds[(game.level-1)].pos());
+		game.sounds[(game.level-1)].fade(1, 0, 5000, function() { game.sounds[(game.level-1)].stop(); });
+	}
+
+	game.sound = new Howl({
+  		urls: ['level' + level +'.ogg'],
+  		loop: true
+	})
 
 	game.container = document.querySelector('.container');
 	game.container.innerHTML = "";
@@ -50,9 +87,9 @@ game.initLevel = function(level) {
 
 game.fog = {
 	
-	r1: 4,
-	r2: 40,
 	init: function() {
+		this.r1 = 4;
+		this.r2 = 40;
 		this.canvas = document.getElementById("fog")	
 		this.context = this.canvas.getContext("2d");
 		this.activated = false;
@@ -61,6 +98,8 @@ game.fog = {
 		if(!this.activated) {
 			return;
 		}
+
+		this.r2-= 0.2;
 
 	    var coords = game.tileToCoord(game.player.x - 1, game.player.y -1);
 
