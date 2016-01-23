@@ -7,19 +7,19 @@ game.load = function() {
 	game.sounds = [];
 
 	game.sounds[1] = new Howl({
-  		urls: ['level1.ogg'],
+  		urls: ['level1.mp3'],
   		loop: true,
   		onload: function() {
   			game.sounds[2] =new Howl({
-		  		urls: ['level2.ogg'],
+		  		urls: ['level2.mp3'],
 		  		loop: true,
 		  		onload: function() {
 		  			game.sounds[3] =new Howl({
-				  		urls: ['level3.ogg'],
+				  		urls: ['level3.mp3'],
 				  		loop: true,
 				  		onload: function() {
 				  			game.sounds[4] =new Howl({
-						  		urls: ['level3.ogg'],
+						  		urls: ['level3.mp3'],
 						  		loop: true,
 						  		onload: function() {
 						  			game.initLevel(1);
