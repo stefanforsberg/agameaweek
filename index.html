@@ -34,6 +34,18 @@
 		.container {
 			max-width: 970px;
 		}
+
+		.footer {
+			min-height: 150px;
+			padding-top: 50px;
+		}
+
+		.game {
+			border-top: solid 1px #f3f3f3;
+			margin-top: 15px;
+			background: -webkit-linear-gradient(top, rgba(240,240,240,1) 0, rgba(240,240,240,0) 200px, rgba(255,255,255,0));
+
+		}
 	</style>
 </head>
 
@@ -50,16 +62,49 @@
     	<p>For 2016 I wanted to try and create a game a week. Since it's already week 2 and I have yet to produce a game it didn't really take long for this project to fail. But fail fast etc. I don't have too many rules about this but the game has to be programmed by me, if there is graphics it should be drawn by me and if there is sound it should be composed by me.</p>
     </div>
 
-    <div class="container">
+    <div class="container game">
     	<h2>Week 02 - Rainbow Robot</h2>
-    	<p>Turns out rxjs is serious business. But trying to loop html audio is even more serious.</p>
-    	<p><a href="/agameaweek/week02/index.html" target="_blank">Click here to play</a></p>
+
+		<div class="row">
+			<div class="col-xs-6">
+		    	<p>Turns out rxjs is serious business. But trying to loop html audio is even more serious.</p>
+		    	<p><a href="/agameaweek/week02/index.html" target="_blank">Click here to play</a></p>
+			</div>
+			<div class="col-xs-6 ">
+		    	<img class="pull-right" src="week02.png" />
+			</div>      	
+		</div>      	
     </div>
 
-    <div class="container">
+    <div class="container game">
     	<h2>Week 03 - Witch run</h2>
-    	<p><a href="/agameaweek/week03/index.html" target="_blank">Click here to play</a></p>
+		<div class="row">
+			<div class="col-xs-6">
+				<p><a href="/agameaweek/week03/index.html" target="_blank">Click here to play</a></p>
+			</div>
+			<div class="col-xs-6 ">
+		    	<img class="pull-right" src="week03.png" />
+			</div>      	
+		</div>
     </div>
+
+    <div class="container game">
+    	<h2>Week 04 - Square in a maze</h2>
+    	<div class="row">
+    		<div class="col-xs-6">
+		    	<p>First game that can be played on ios too</p>
+		    	<p>Had help from <a href="http://dstromberg.com/2013/07/tutorial-random-maze-generation-algorithm-in-javascript/">this tutorial</a> on maze generation</p>
+		    	<p><a href="/agameaweek/week04/index.html" target="_blank">Click here to play</a></p>
+    		</div>
+    		<div class="col-xs-6 ">
+		    	<img class="pull-right" src="week04.png" />
+    		</div>    		
+    	</div>
+    </div>    
+
+	<div class="container footer">
+		@cykelkatalogen
+	</div>
 </body>
 
 </html>
