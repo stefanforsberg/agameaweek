@@ -2,6 +2,8 @@ var game = game || {};
 
 game.load = function() {
 
+	game.addTouchControls();
+
 	game.sounds = [];
 
 	game.sounds[1] = new Howl({
@@ -41,9 +43,9 @@ game.initLevel = function(level) {
 
 	if(game.level > 1) {
 		game.sounds[(game.level-1)].fade(1, 0, 5000, function() { game.sounds[(game.level-1)].stop(); });		
-		game.sounds[game.level].pos(game.sounds[(game.level-1)].pos());
 		game.sounds[game.level].fade(0, 1, 5000);
 		game.sounds[game.level].play();		
+		game.sounds[game.level].pos(game.sounds[(game.level-1)].pos());
 	} else {
 		game.sounds[game.level].fade(0, 1, 5000);
 		game.sounds[game.level].play();
@@ -385,13 +387,49 @@ game.tileToCoord = function (x, y) {
 	}
 }
 
+game.addTouchControls = function() {
+
+	Rx.Observable.fromEvent(document, 'touchstart').subscribe(function(e) {
+	    e.preventDefault();
+	    var touch = e.touches[0];
+	    console.log(touch.pageX + " - " + touch.pageY);
+	})
+
+	// document.addEventListener('touchstart', function(e) {
+
+	// 	}
+	// , false);
+}
 
 game.resize = function() {
-	var height = window.innerHeight * 0.8;
 	
-	var ratio = game.canvas.width/game.canvas.height;
-	var width = height * ratio;
+	var maxHeight = 0;
+	var maxWidth = 0;
+
+	var widthHeightRatio = game.canvas.width/game.canvas.height;
+	var heightWidthRatio = game.canvas.height/game.canvas.width;
+
+
+	maxWidth = window.innerWidth * .8;
+	maxHeight = window.innerHeight * .8
+
+	var width = 0;
+	var height = 0;
+
+	console.log(maxWidth + " - " + maxHeight);
+	console.log(maxHeight * widthHeightRatio);
+
+	if(maxHeight * widthHeightRatio < maxWidth) {
+		console.log("basing on height");
+		height = maxHeight;
+		width = maxHeight * widthHeightRatio;
+	} else {
+		console.log("basing on width");
+		height = maxWidth * heightWidthRatio;
+		width = maxWidth;
+	}
 	
+
 	game.canvas.style.width = width+'px';
 	game.canvas.style.height = height+'px';
     game.canvas.style.marginLeft = "-" +  width /2 +  "px";
