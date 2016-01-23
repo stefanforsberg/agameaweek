@@ -2,8 +2,6 @@ var game = game || {};
 
 game.load = function() {
 
-	game.addTouchControls();
-
 	game.sounds = [];
 
 	game.sounds[1] = new Howl({
@@ -159,6 +157,8 @@ game.init = function() {
 
 	game.canvas = document.getElementById("game");
 	game.context = game.canvas.getContext("2d");
+
+	game.addTouchControls();
 
 	game.maze.init();
 
