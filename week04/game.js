@@ -14,14 +14,21 @@ game.load = function() {
 		  		onload: function() {
 		  			game.sounds[3] =new Howl({
 				  		urls: ['level3.ogg'],
-				  		loop: true
+				  		loop: true,
+				  		onload: function() {
+				  			game.sounds[4] =new Howl({
+						  		urls: ['level3.ogg'],
+						  		loop: true,
+						  		onload: function() {
+						  			game.initLevel(1);
+						  		}
+				  			})
+		  				}
 		  			})
   				}
 			})
 		}
 	})
-
-	game.initLevel(1);
 }
 
 game.initLevel = function(level) {
@@ -32,12 +39,14 @@ game.initLevel = function(level) {
 
 	game.level = level;
 
-	game.sounds[game.level].fade(0, 1, 5000);
-	game.sounds[game.level].play();
-
 	if(game.level > 1) {
+		game.sounds[(game.level-1)].fade(1, 0, 5000, function() { game.sounds[(game.level-1)].stop(); });		
 		game.sounds[game.level].pos(game.sounds[(game.level-1)].pos());
-		game.sounds[(game.level-1)].fade(1, 0, 5000, function() { game.sounds[(game.level-1)].stop(); });
+		game.sounds[game.level].fade(0, 1, 5000);
+		game.sounds[game.level].play();		
+	} else {
+		game.sounds[game.level].fade(0, 1, 5000);
+		game.sounds[game.level].play();
 	}
 
 	game.sound = new Howl({
@@ -60,6 +69,9 @@ game.initLevel = function(level) {
 	} else if(game.level === 3) {
 		game.tileWidth = 16;
 		game.tileHeight = 10;
+	} else if(game.level === 3) {
+		game.tileWidth = 24;
+		game.tileHeight = 14;
 	}
 
 	game.width = game.tileSize * game.tileWidth + game.tilePadding*(game.tileWidth-1);
@@ -82,7 +94,7 @@ game.initLevel = function(level) {
 
     game.init();
 
-    resize();
+    game.resize();
 }
 
 game.fog = {
@@ -374,13 +386,9 @@ game.tileToCoord = function (x, y) {
 }
 
 
-function resize() {
-	// Our canvas must cover full height of screen
-	// regardless of the resolution
+game.resize = function() {
 	var height = window.innerHeight * 0.8;
 	
-	// So we need to calculate the proper scaled width
-	// that should work well with every resolution
 	var ratio = game.canvas.width/game.canvas.height;
 	var width = height * ratio;
 	
@@ -392,6 +400,3 @@ function resize() {
 	game.fog.canvas.style.height = height+'px';
     game.fog.canvas.style.marginLeft = "-" +  width /2 +  "px";
 }
-
-// window.addEventListener('load', resize, false);
-// window.addEventListener('resize', resize, false);
