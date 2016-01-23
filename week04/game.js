@@ -164,7 +164,9 @@ game.init = function() {
 
 	Rx.Observable
 		.timer(500, 1000)
-		.map(i => 5 - i)
+		.map(function (i) {
+			return (5 - i);
+		})
 		.take(6)
 		.subscribe(function(i) {
 			game.update();
