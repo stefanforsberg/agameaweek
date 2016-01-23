@@ -114,10 +114,12 @@ game.fog = {
 			this.lastr2 = this.r2;
 			this.r2 = 250;
 		} else {
-			this.r2 = this.lastr2;
+			if(this.r2 >= 200) {
+				this.r2 = this.lastr2;	
+			}
 		}
 
-		this.r2-= 0.2;
+		this.r2-= 0.1;
 
 	    var coords = game.tileToCoord(game.player.x - 1, game.player.y -1);
 
@@ -450,9 +452,6 @@ game.resize = function() {
 
 	var width = 0;
 	var height = 0;
-
-	console.log(maxWidth + " - " + maxHeight);
-	console.log(maxHeight * widthHeightRatio);
 
 	if(maxHeight * widthHeightRatio < maxWidth) {
 		height = maxHeight;
