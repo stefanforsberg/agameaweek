@@ -158,8 +158,6 @@ game.init = function() {
 	game.canvas = document.getElementById("game");
 	game.context = game.canvas.getContext("2d");
 
-	game.addTouchControls();
-
 	game.maze.init();
 
 	game.fog.init();
@@ -187,7 +185,7 @@ game.init = function() {
 
 			game.update();
 
-			game.streamSubscription = game.player.playerStream.subscribe(function () {
+			game.streamSubscription = game.getStream().subscribe(function () {
 				game.update();
 			})
 	}
@@ -318,35 +316,29 @@ game.player = {
 	init: function(x, y) {
 		this.visited = {};
 		this.newPosition(x, y);
-		this.playerStream = Rx.Observable.fromEvent(document, 'keydown')
-		.filter(function (k) {
-			return (k.keyCode === 37 || k.keyCode === 39 || k.keyCode === 38 || k.keyCode === 40)
-		})
-		.map(function (k) {
-			return k.keyCode
-		})
-		.scan(function (p, k) {
-			
-			if(k === 37) {
-				if(game.maze.canGoTo(p.x, p.y, "l")) {
-					p.newPosition(p.x-1, p.y);
-				}				
-			} else if (k === 39) {
-				if(game.maze.canGoTo(p.x, p.y, "r")) {
-					p.newPosition(p.x+1, p.y);
-				}
-			} else if (k === 40) {
-				if(game.maze.canGoTo(p.x, p.y, "d")) {
-					p.newPosition(p.x, p.y+1);
-				}
-			} else if (k === 38) {
-				if(game.maze.canGoTo(p.x, p.y, "u")) {
-					p.newPosition(p.x, p.y-1);
-				}
-			}
 
-			return p;
-		}, this);
+		
+	},
+	updateFromStream: function(p, k) {
+		if(k === 37) {
+			if(game.maze.canGoTo(p.x, p.y, "l")) {
+				p.newPosition(p.x-1, p.y);
+			}				
+		} else if (k === 39) {
+			if(game.maze.canGoTo(p.x, p.y, "r")) {
+				p.newPosition(p.x+1, p.y);
+			}
+		} else if (k === 40) {
+			if(game.maze.canGoTo(p.x, p.y, "d")) {
+				p.newPosition(p.x, p.y+1);
+			}
+		} else if (k === 38) {
+			if(game.maze.canGoTo(p.x, p.y, "u")) {
+				p.newPosition(p.x, p.y-1);
+			}
+		}
+
+		return p;
 	},
 	draw: function() {
 		var visited = this.visited;
@@ -396,18 +388,52 @@ game.tileToCoord = function (x, y) {
 	}
 }
 
-game.addTouchControls = function() {
+game.getStream = function() {
 
-	Rx.Observable.fromEvent(document, 'touchstart').subscribe(function(e) {
-	    e.preventDefault();
-	    var touch = e.touches[0];
-	    console.log(touch.pageX + " - " + touch.pageY);
-	})
+	var keyStream = Rx.Observable.fromEvent(document, 'keydown')
+		.filter(function (k) {
+			return (k.keyCode === 37 || k.keyCode === 39 || k.keyCode === 38 || k.keyCode === 40)
+		})
+		.map(function (k) {
+			return k.keyCode
+		})
 
-	// document.addEventListener('touchstart', function(e) {
+	var touchStream = Rx.Observable.fromEvent(game.fog.canvas, 'touchstart')
+		.map(function (e) {
+			 e.preventDefault();
+		    var touch = e.touches[0];
 
-	// 	}
-	// , false);
+		    var boundingRect = game.canvas.getBoundingClientRect()
+
+		    var localX = (touch.pageX - boundingRect.left);
+		    var localY = (touch.pageY - boundingRect.top);
+
+		    var coords = game.tileToCoord(game.player.x, game.player.y);
+		    var position = {
+		    	left: coords.x*(game.canvas.scaledWidth/game.canvas.width),
+		    	right: (coords.x+game.tileSize)*(game.canvas.scaledWidth/game.canvas.width),
+		    	top: coords.y*(game.canvas.scaledHeight/game.canvas.height),
+		    	bottom: (coords.y+game.tileSize)*(game.canvas.scaledHeight/game.canvas.height),
+		    }
+
+		    if(localX < position.left) {
+		    	return 37
+		    } else if(localX > position.right) {
+		    	return 39
+		    } else if(localY < position.top) {
+		    	return 38
+		    } else if(localY > position.bottom) {
+		    	return 40
+		    }
+
+		    return "";
+		})
+		.filter(function (k) {
+			return k !== ""
+		});
+
+	return Rx.Observable.merge(touchStream, keyStream)
+		.scan(game.player.updateFromStream, game.player)		
 }
 
 game.resize = function() {
@@ -429,15 +455,15 @@ game.resize = function() {
 	console.log(maxHeight * widthHeightRatio);
 
 	if(maxHeight * widthHeightRatio < maxWidth) {
-		console.log("basing on height");
 		height = maxHeight;
 		width = maxHeight * widthHeightRatio;
 	} else {
-		console.log("basing on width");
 		height = maxWidth * heightWidthRatio;
 		width = maxWidth;
 	}
-	
+
+	game.canvas.scaledWidth = width;
+	game.canvas.scaledHeight = height;
 
 	game.canvas.style.width = width+'px';
 	game.canvas.style.height = height+'px';
