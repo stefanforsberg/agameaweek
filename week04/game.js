@@ -51,11 +51,6 @@ game.initLevel = function(level) {
 		game.sounds[game.level].play();
 	}
 
-	game.sound = new Howl({
-  		urls: ['level' + level +'.ogg'],
-  		loop: true
-	})
-
 	game.container = document.querySelector('.container');
 	game.container.innerHTML = "";
 
@@ -71,7 +66,7 @@ game.initLevel = function(level) {
 	} else if(game.level === 3) {
 		game.tileWidth = 16;
 		game.tileHeight = 10;
-	} else if(game.level === 3) {
+	} else if(game.level === 4) {
 		game.tileWidth = 24;
 		game.tileHeight = 14;
 	}
@@ -91,7 +86,7 @@ game.initLevel = function(level) {
     fog.id     = "fog";
     fog.width  = game.width;
     fog.height = game.height;
-    fog.style.zIndex   = 1;
+    fog.style.zIndex   = 2;
     game.container.appendChild(fog)
 
     game.init();
@@ -103,14 +98,25 @@ game.fog = {
 	
 	init: function() {
 		this.r1 = 4;
-		this.r2 = 40;
+		this.r2 = 40 + 6*(game.level);
+		this.lastr2 = this.r2;
 		this.canvas = document.getElementById("fog")	
 		this.context = this.canvas.getContext("2d");
 		this.activated = false;
+		this.counter = 0;
 	},
 	draw: function() {
 		if(!this.activated) {
 			return;
+		}
+
+		this.counter++;
+
+		if(this.counter % 15 === 0) {
+			this.lastr2 = this.r2;
+			this.r2 = 250;
+		} else {
+			this.r2 = this.lastr2;
 		}
 
 		this.r2-= 0.2;
@@ -366,6 +372,7 @@ game.player = {
 		game.context.fillRect(coords.x + 3, coords.y + 3, game.tileSize - 6, game.tileSize - 6);
 	},
 	newPosition: function(x, y) {
+
 		this.x = x;
 		this.y = y;
 
