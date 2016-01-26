@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Square in a maze</title>
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+			color: #606060;
+		}
+
+		h1 {
+			font-family: 'Oswald', sans-serif;
+			color: #7560FF;
+			text-transform: uppercase;
+			font-size: 48px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+
+		.container {
+			position: relative;
+			margin: 0 auto;
+		}
+
+		.info {
+			clear: both;
+			position: relative;
+			margin: 0 auto;
+		}
+
+		.content {
+			float: left;
+			width: 500px;
+			padding: 8px;
+			border-radius: 3px;
+			background-color: rgba(255,255,255,0.5);
+			min-height: 484px;
+		}
+
+		.content img {
+			vertical-align: middle;
+		}
+
+		.game {
+			position: relative;
+			float: right;
+			padding: 8px;
+			border-radius: 3px;
+			background-color: rgba(255,255,255,0.5);
+			min-height: 400px;
+		}
+
+		.start-button {
+			position: absolute;
+			left: 125px;
+			top: 220px;
+
+		}
+
+		.score {
+			position: absolute;
+			left: 40px;
+			top: 14px;
+			font-family: Arial;
+			font-weight: bold;
+		}
+
+		.score img {
+			vertical-align: middle;
+		}
+
+		.score span {
+			margin-left: 3px;
+			vertical-align: middle;
+		}
+
+		#start {
+			border: solid 1px #ffffff;
+    		background-color: rgba(255,255,255,0.6);
+    		color: #2F5C72;
+    		text-transform: uppercase;
+    		font-family: 'Oswald', sans-serif;
+    		padding: 12px 40px;
+		}
+
+		
+	</style>
+
+	<link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+	<div class="container">
+		<canvas id="game" width="640" height="480"></canvas>
+	</div>
+
+	<img src="map.png" id="map" style="display: none;" />
+	<img src="player.png" id="player" style="display: none;" />
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+
+	<script>
+		var game = game || {};
+
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(game.load());
+
+
+	</script>
+
+</body>
+
+</html>
+
