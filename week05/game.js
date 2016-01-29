@@ -246,6 +246,20 @@ game.player = {
 
 		this.y += this.vy;
 		this.x += this.vx;
+
+		var relativeScreenPosition = {
+			x: this.x - game.offsetX,
+			y: this.y - game.offsetY,
+		} 
+
+		console.log(relativeScreenPosition);
+
+		if(relativeScreenPosition.x > 448) {
+			game.offsetX+=4;
+		} else if(relativeScreenPosition.x < 120 && game.offsetX >= 4) {
+			game.offsetX-=4;
+		}
+
 	},
 	draw: function() {
 
