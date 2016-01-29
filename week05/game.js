@@ -85,53 +85,45 @@ game.setup = function() {
 		return (k.keyCode === 37 || k.keyCode === 39 || k.keyCode === 38 || k.keyCode === 40)
 	})
 	.map(function (k) {
-		return k.keyCode
-	}).subscribe(function (keyCode) {
-
-		if(keyCode === 38) {
-			game.keys.u = true;
-		} else if(keyCode === 39) {
-			game.keys.r = true;
-		}
-	});
+		return { keyCode: k.keyCode, pressed: true };
+	})
 
 	var keyUpStream = Rx.Observable.fromEvent(document, 'keyup')
 	.filter(function (k) {
 		return (k.keyCode === 37 || k.keyCode === 39 || k.keyCode === 38 || k.keyCode === 40)
 	})
 	.map(function (k) {
-		return k.keyCode
-	}).subscribe(function (keyCode) {
+		return { keyCode: k.keyCode, pressed: false };
+	})
 
-		if(keyCode === 38) {
-			game.keys.u = false;
-		} else if(keyCode === 39) {
-			game.keys.r = false;
-		}
+	Rx.Observable.merge(keyUpStream, keyDownStream)
+		.subscribe(function (k) {
 
-		// if(keyCode === 38) {
-		// 	game.player.vy = -15;
-		// } 
 
-		// game.player.x++;
-		// game.offsetX++;
-	});	
+			// If player is already moving in one direction ignore keyup events for other direction
+			if(game.player.vx > 0 && !k.pressed && k.keyCode === 37)  {
+				return;
+			}
+
+			if(game.player.vx < 0 && !k.pressed && k.keyCode === 39)  {
+				return;
+			}
+
+
+			switch(k.keyCode) {
+				case 38:
+					if(k.pressed) { game.player.jump(); }
+					break;
+				case 39:
+					k.pressed ? game.player.vx = 4 : game.player.vx = 0;
+					break;
+				case 37:
+					k.pressed ? game.player.vx = -4 : game.player.vx = 0;
+					break;					
+			}
+		});
 
 	Rx.Observable.interval(33).subscribe(function () {
-
-		if(game.keys.u) {
-			game.player.jump();
-		} 
-		if(game.keys.r) {
-			game.offsetX+=4;
-			game.player.vx = 4;
-		}
-
-		
-
-		
-
-		;
 
 		game.player.update();
 
@@ -193,14 +185,19 @@ game.player = {
 	x: 10,
 	y: 200,
 	isJumping: false,
+	isGrounded: false,
 
 	init: function() {
 
 	},
 	jump: function() {
-		this.vy = -20;
-		this.isJumping = true;
-		console.log("jump");
+		if(this.isGrounded) {
+			this.vy = -15;
+			this.isJumping = true;
+			this.isGrounded = false;
+			console.log("jump");	
+		}
+		
 	},
 	update: function() {
 		this.vy += 0.98;
@@ -209,14 +206,6 @@ game.player = {
 			this.isJumping = false;
 		}
 
-		// var currentXtile = Math.floor(game.player.x / 32);
-		// if(game.player.x % 32 !== 0) {
-		// 	console.log("not");
-		// 	currentXtile = currentXtile + " - " + (currentXtile + 1);
-		// }
-
-		// console.log(currentXtile);
-		
 		var tX = Math.floor(game.player.x / game.tileSize);
 		var tY = Math.floor(game.player.y / game.tileSize);
 
@@ -227,21 +216,33 @@ game.player = {
 			if(game.tiles[tY+1][tX] != 0 || game.tiles[tY+1][tX+1] != 0) {
 				this.y = tY*game.tileSize;
 				this.vy = 0;
+				this.isGrounded = true;
 			}	
+		} else {
+
+			// hits "roof"
+			if(!game.tiles[tY-1]) {
+				this.y = tY*game.tileSize;
+				this.vy = 0.98;
+			} else {
+				if(game.tiles[tY-1][tX] != 0 || game.tiles[tY-1][tX+1] != 0) {
+					this.y = tY*game.tileSize;
+					this.vy = 0.98;
+				}		
+			}
+
+			
 		}
 
-		if(game.tiles[tY][tX+1] != 0) {
+		if(this.vx > 0 && game.tiles[tY][tX+1] != 0) {
 			this.x = tX*game.tileSize;
 			this.vx = 0;
 		}		
 
-		
-		
-
-
-		// if(this.y > 310) {
-		// 	this.vy = 0;
-		// }
+		if(this.vx < 0 && game.tiles[tY][tX-1] != 0) {
+			this.x = tX*game.tileSize;
+			this.vx = 0;
+		}		
 
 		this.y += this.vy;
 		this.x += this.vx;
