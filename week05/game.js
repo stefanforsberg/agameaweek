@@ -35,6 +35,54 @@ game.loadMap = function(callback) {
     request.send();
 }
 
+game.background = {
+
+	init: function() {
+		game.background.mountains1 = document.createElement('canvas');
+	    game.background.mountains1.width = 1200;
+	    game.background.mountains1.height = 450;
+
+		game.background.mountains2 = document.createElement('canvas');
+	    game.background.mountains2.width = 700;
+	    game.background.mountains2.height = 450;	    
+
+	    var canvas = game.background.mountains1.getContext("2d")
+
+	    canvas.fillStyle = "rgba(100, 100, 100, 1)"
+	    var distance = game.background.mountains1.width / 8;
+	    for(var i = 0; i < 8; i++) {
+	    	canvas.beginPath();
+	    	var width = 200 + Math.random()*distance
+	    	canvas.moveTo(i*distance, 425)
+	    	canvas.lineTo(i*distance + width, 425)
+	    	canvas.lineTo(i*distance + width / 2, 50 + Math.random()*200)
+	    	canvas.lineTo(i*distance, 425)
+	    	canvas.fill();
+	    }
+
+	    canvas = game.background.mountains2.getContext("2d")
+	    canvas.fillStyle = "rgba(200, 200, 200, 1)"
+	    distance = game.background.mountains2.width / 8;
+	    for(var i = 0; i < 8; i++) {
+	    	canvas.beginPath();
+	    	var width = 100+ Math.random()*145
+	    	canvas.moveTo(i*distance, 425)
+	    	canvas.lineTo(i*distance + width, 425)
+	    	canvas.lineTo(i*distance + width / 2, Math.random()*80)
+	    	canvas.lineTo(i*distance, 425)
+	    	canvas.fill();
+	    }	    
+	},
+	draw: function() {
+
+		var relativePosition = (game.background.mountains2.width - game.width) * (game.offsetX / map.naturalWidth)
+		game.context.drawImage(game.background.mountains2, -relativePosition, 0)
+
+		relativePosition = (game.background.mountains1.width - game.width) * (game.offsetX / map.naturalWidth)
+		game.context.drawImage(game.background.mountains1, -relativePosition, 0)
+	}
+}
+
 game.setup = function() {
 	game.width = 640;
 	game.height = 480;
@@ -49,29 +97,29 @@ game.setup = function() {
 
 	var map = document.getElementById("map");
 
-	console.log(map);
-
 	game.map = document.createElement('canvas');
     game.map.id     = "mapCanvas";
     game.map.width  = map.naturalWidth;
     game.map.height = map.naturalHeight;
 
+    game.background.init();
+
     var context = game.map.getContext("2d");
 
     context.drawImage(map, 0, 0);
 
-    context.beginPath();
-    for(var y = 0; y < game.tiles.length; y++) {
-    	context.moveTo(0, y*game.tileSize);
-    	context.lineTo(game.tiles[0].length*game.tileSize, y*game.tileSize)
-    }
+ //    context.beginPath();
+ //    for(var y = 0; y < game.tiles.length; y++) {
+ //    	context.moveTo(0, y*game.tileSize);
+ //    	context.lineTo(game.tiles[0].length*game.tileSize, y*game.tileSize)
+ //    }
 
-	for(var x = 0; x < game.tiles[0].length; x++) {
-    	context.moveTo(x*game.tileSize, 0);
-    	context.lineTo(x*game.tileSize, game.tiles.length*game.tileSize)
-    }
+	// for(var x = 0; x < game.tiles[0].length; x++) {
+ //    	context.moveTo(x*game.tileSize, 0);
+ //    	context.lineTo(x*game.tileSize, game.tiles.length*game.tileSize)
+ //    }
 
-    context.stroke()
+ //    context.stroke()
 
 	game.keys = {
 		u: false,
@@ -133,7 +181,11 @@ game.setup = function() {
 
 		game.context.clearRect(0, 0, game.width, game.height);
 
+		game.background.draw();
+
 		game.context.translate(- game.offsetX, - game.offsetY);
+
+		
 
 		game.context.drawImage(game.map, 0, 0)
 
@@ -186,6 +238,7 @@ game.player = {
 	y: 200,
 	isJumping: false,
 	isGrounded: false,
+	previous: [],
 
 	init: function() {
 
@@ -244,6 +297,11 @@ game.player = {
 			this.vx = 0;
 		}		
 
+		this.previous.push({x: this.x, y: this.y})
+		if(this.previous.length > 8) {
+			this.previous.shift();
+		}
+
 		this.y += this.vy;
 		this.x += this.vx;
 
@@ -251,8 +309,6 @@ game.player = {
 			x: this.x - game.offsetX,
 			y: this.y - game.offsetY,
 		} 
-
-		console.log(relativeScreenPosition);
 
 		if(relativeScreenPosition.x > 448) {
 			game.offsetX+=4;
@@ -266,9 +322,16 @@ game.player = {
 var tX = Math.floor(game.player.x / game.tileSize);
 		var tY = Math.floor(game.player.y / game.tileSize);
 
-		game.context.fillRect(tX*game.tileSize, (tY+1)*game.tileSize, game.tileSize, game.tileSize);
+		game.context.fillRect(this.x, this.y, game.tileSize, game.tileSize);
 
-		game.context.drawImage(document.getElementById("player"), this.x, this.y)
+		
+		for(var i = this.previous.length-1; i >= 0; i--) {
+			console.log(this.previous[i]);
+			game.context.save();
+			game.context.fillStyle = "rgba(0,0,0," + 0.5*i/10 + ")";
+			game.context.fillRect(this.previous[i].x, this.previous[i].y, game.tileSize, game.tileSize);			
+			game.context.restore();
+		}
 	}
 }
 
