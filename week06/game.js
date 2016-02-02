@@ -56,9 +56,15 @@ game.setupObjects = function() {
 			game.monsters.items.push(new game.monster(o.x, o.y, parseFloat(o.properties.vx), parseFloat(o.properties.vy), parseInt(o.properties.minY), parseInt(o.properties.maxY)));
 		} else if(o.type === "key") {
 			game.pickableItems.items.push(new game.key(o.x, o.y));			
+		} if(o.type === "door") {
+			game.pickableItems.items.push(new game.door(o.x, o.y));			
 		}
 
 	});
+}
+
+game.inventory = {
+	keys: 0
 }
 
 game.background = {
@@ -75,6 +81,10 @@ game.background = {
 		game.background.trees = document.createElement('canvas');
 	    game.background.trees.width = 1500;
 	    game.background.trees.height = 450;	
+
+		game.background.treesColor = document.createElement('canvas');
+	    game.background.treesColor.width = 1500;
+	    game.background.treesColor.height = 450;		    
 
 	    var canvas = game.background.mountains1.getContext("2d")
 	    canvas.fillStyle = "rgba(180, 180, 180, 1)"
@@ -103,24 +113,38 @@ game.background = {
 	    }	 
 
 	    canvas = game.background.trees.getContext("2d")
+	    var canvasColor = game.background.treesColor.getContext("2d")
 	    distance = game.background.trees.width / 40;
+	    var treeColors = ["#86E55E", "#ABE067", "#6FDB6B"]
 	    for(var i = 0; i < 40; i++) {
 	    	canvas.beginPath();
+	    	canvasColor.beginPath();
 	    	var color = Math.round(65 + Math.random()*50);
+	    	var treeColor = treeColors[Math.floor(Math.random()*treeColors.length)];
 	    	canvas.fillStyle = "rgba(" + color + ", " + color + ", " + color + ", 1)"
 	    	var width = 5 + Math.random(5);
 	    	var height = 85+95*Math.random();
 
-
 	    	if(Math.random() < 0.5) {
 	    		canvas.fillRect(i*distance, 480 , width, -height)
 				canvas.arc(i*distance + width/2, 480-height, 10+Math.random()*40, 0, 2 * Math.PI, false);	
+
+				canvasColor.fillStyle = "#C47538"
+				canvasColor.fillRect(i*distance, 480 , width, -height)
+				canvasColor.fillStyle = treeColor;
+				canvasColor.arc(i*distance + width/2, 480-height, 10+Math.random()*40, 0, 2 * Math.PI, false);					
 	    	} else {
 	    		canvas.arc(i*distance, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
 	    		canvas.arc(i*distance + width/2, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
 	    		canvas.arc(i*distance + width, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
+
+	    		canvasColor.fillStyle = treeColor;
+	    		canvasColor.arc(i*distance, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
+	    		canvasColor.arc(i*distance + width/2, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
+	    		canvasColor.arc(i*distance + width, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
 	    	}
 	    	canvas.fill();
+	    	canvasColor.fill();
 	    }		       
 	},
 	draw: function() {
@@ -132,7 +156,7 @@ game.background = {
 		game.context.drawImage(game.background.mountains1, -relativePosition, 0)
 
 		relativePosition = (game.background.trees.width - game.width) * (game.offsetX / map.naturalWidth)
-		game.context.drawImage(game.background.trees, -relativePosition, 0)
+		game.context.drawImage(game.background.treesColor, -relativePosition, 0)
 	}
 }
 
@@ -311,16 +335,44 @@ game.key = function(x,y) {
 	this.w = game.tileSize;
 	this.h = game.tileSize;
 	this.sprite = document.getElementById("key");
-
+	this.isActive = true;
 	return this;
 }
 
-game.isOnScreen = function(i) {
-	return game.collides(i, {x: game.offsetX, y: 0, w: game.width, h: game.height});
+game.key.prototype.draw = function() {
+	if(game.isOnScreen(this) && this.isActive) {
+
+		if(game.collides(this, game.player)) {
+			game.inventory.keys++;
+			this.isActive = false;
+		}
+
+		game.context.drawImage(this.sprite, this.x, this.y);	
+	}
 }
 
-game.key.prototype.draw = function() {
-	if(game.isOnScreen(this)) {
+game.door = function(x,y) {
+	this.x = x;
+	this.y = y;
+	this.w = game.tileSize;
+	this.h = game.tileSize*3;
+	this.sprite = document.getElementById("door");
+	this.isActive = true;
+	return this;	
+}
+
+game.door.prototype.draw = function() {
+	if(game.isOnScreen(this) && this.isActive) {
+
+		if(game.collides(this, game.player)) {
+			if(game.inventory.keys === 0) {
+				game.player.x -= 20;
+			} else {
+				game.inventory.keys--;
+				this.isActive = false;
+			}
+		}
+
 		game.context.drawImage(this.sprite, this.x, this.y);	
 	}
 }
@@ -365,9 +417,9 @@ game.monster.prototype.updateVx = function() {
 	var tX = Math.floor(this.x / game.tileSize);
 	var tY = Math.floor(this.y / game.tileSize);
 
-	if(game.tiles[tY+1][tX+1] == 0) {
+	if(game.tiles[tY+1][tX+1] === 0 || game.tiles[tY][tX+1] === 1) {
 		this.vx = this.vx * -1;
-	} else if(game.tiles[tY+1][tX] == 0) {
+	} else if(game.tiles[tY+1][tX] == 0 || game.tiles[tY][tX+1] === 1) {
 		this.vx = this.vx * -1;
 	}
 
@@ -389,7 +441,7 @@ game.monster.prototype.draw = function() {
 game.player = {
 	vy: 0,
 	vx: 0,
-	x: 10,
+	x: 32,
 	y: 250,
 	w: game.tileSize,
 	h: game.tileSize,
@@ -601,7 +653,6 @@ game.player = {
 				game.context.restore();
 			}
 		}
-		console.log(this.currentSprite)
 		game.context.drawImage(this.currentSprite, [this.currentSpriteIndex*game.tileSize], 0, game.tileSize, game.tileSize, this.x, this.y, game.tileSize, game.tileSize);
 	}
 }
@@ -619,3 +670,7 @@ game.collides = function colCheck(shapeA, shapeB) {
     }
     return false;
 };
+
+game.isOnScreen = function(i) {
+	return game.collides(i, {x: game.offsetX, y: 0, w: game.width, h: game.height});
+}
