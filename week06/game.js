@@ -13,18 +13,22 @@ game.loadMap = function(callback) {
     request.onreadystatechange = function() {
 		if ((request.readyState == 4))
 		{
-			var parsedMapData = JSON.parse(request.responseText).layers[0];
+			var parsedMapData = JSON.parse(request.responseText);
+
+			var mapLayerData = parsedMapData.layers[0];
+
+			game.setupObjects(parsedMapData.layers[1])
 
 			game.tiles = [];
 
 			var tiledDataCounter = 0;
 
-			for (var y = 0; y < parsedMapData.height; y++) {
+			for (var y = 0; y < mapLayerData.height; y++) {
 
 				var xArray = [];
 
-				for (var x = 0; x < parsedMapData.width; x++) {
-					xArray.push(parsedMapData.data[tiledDataCounter])
+				for (var x = 0; x < mapLayerData.width; x++) {
+					xArray.push(mapLayerData.data[tiledDataCounter])
 
 					tiledDataCounter++;
 				}
@@ -37,6 +41,15 @@ game.loadMap = function(callback) {
     }
     request.open("GET", "map.json", true);
     request.send();
+}
+
+game.setupObjects = function(objectLayer) {
+	objectLayer.objects.forEach(function (o) {
+		if(o.type === "monster") {
+
+			game.monsters.items.push(new game.monster(o.x,o.y, parseInt(o.properties.vX), parseInt(o.properties.vY), parseInt(o.properties.minY), parseInt(o.properties.maxY)));
+		}
+	});
 }
 
 game.background = {
@@ -243,9 +256,9 @@ game.load = function() {
 game.monsters = {
 	items: [],
 	init: function() {
-		this.items.push(new game.monster(8,11, game.monster.updateVx, 0.5, 0));
-		this.items.push(new game.monster(4,4, game.monster.updateVy, 0, 4, 3, 11));
-		this.items.push(new game.monster(60,11, game.monster.updateVy, 0, -2, 5, 11));
+		// this.items.push(new game.monster(8,11, game.monster.updateVx, 0.5, 0));
+		// this.items.push(new game.monster(4,4, game.monster.updateVy, 0, 4, 3, 11));
+		// this.items.push(new game.monster(60,11, game.monster.updateVy, 0, -2, 5, 11));
 	},
 	draw: function() {
 		this.items.forEach(function (i) {
@@ -267,16 +280,22 @@ game.monsters = {
 
 }
 
-game.monster = function(tx, ty, updator, vx, vy, minTY, maxTY) {
-	this.x = tx*game.tileSize;
-	this.y = ty*game.tileSize;
+game.monster = function(x, y, vx, vy, minY, maxY) {
+	this.x = x;
+	this.y = y;
 	this.w = game.tileSize,
 	this.h = game.tileSize,
 	this.vx = vx;
 	this.vy = vy;
-	this.minTY = minTY;
-	this.maxTY = maxTY;
-	this.updator = updator;
+	this.minY = minY;
+	this.maxY = maxY;
+
+	if(this.vx !== 0) {
+		this.updator = game.monster.updateVx;
+	} else if(this.vy !== 0) {
+		this.updator = game.monster.updateVy;
+	}
+
 	return this;
 }
 
@@ -284,9 +303,9 @@ game.monster.updateVy = function() {
 	var tYmin = Math.floor(this.y / game.tileSize);
 	var tYmax = Math.ceil(this.y / game.tileSize);
 
-	if(this.vy > 0 && tYmax > this.maxTY) {
+	if(this.vy > 0 && this.y > this.maxY) {
 		this.vy = -1*this.vy;
-	}  else if(this. vy < 0 && tYmin < this.minTY) {
+	}  else if(this.vy < 0 && this.y < this.minY) {
 		this.vy = -1*this.vy;
 	}
 
