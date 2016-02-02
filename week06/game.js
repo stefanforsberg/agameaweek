@@ -243,7 +243,9 @@ game.load = function() {
 game.monsters = {
 	items: [],
 	init: function() {
-		this.items.push(new game.monster(8,11,0.5));
+		this.items.push(new game.monster(8,11, game.monster.updateVx, 0.5, 0));
+		this.items.push(new game.monster(4,4, game.monster.updateVy, 0, 4, 3, 11));
+		this.items.push(new game.monster(60,11, game.monster.updateVy, 0, -2, 5, 11));
 	},
 	draw: function() {
 		this.items.forEach(function (i) {
@@ -265,16 +267,33 @@ game.monsters = {
 
 }
 
-game.monster = function(tx, ty, vx) {
+game.monster = function(tx, ty, updator, vx, vy, minTY, maxTY) {
 	this.x = tx*game.tileSize;
 	this.y = ty*game.tileSize;
 	this.w = game.tileSize,
 	this.h = game.tileSize,
 	this.vx = vx;
+	this.vy = vy;
+	this.minTY = minTY;
+	this.maxTY = maxTY;
+	this.updator = updator;
 	return this;
 }
 
-game.monster.prototype.draw = function() {
+game.monster.updateVy = function() {
+	var tYmin = Math.floor(this.y / game.tileSize);
+	var tYmax = Math.ceil(this.y / game.tileSize);
+
+	if(this.vy > 0 && tYmax > this.maxTY) {
+		this.vy = -1*this.vy;
+	}  else if(this. vy < 0 && tYmin < this.minTY) {
+		this.vy = -1*this.vy;
+	}
+
+	this.y += this.vy;
+}
+
+game.monster.updateVx = function() {
 
 	var tX = Math.floor(this.x / game.tileSize);
 	var tY = Math.floor(this.y / game.tileSize);
@@ -286,6 +305,10 @@ game.monster.prototype.draw = function() {
 	}
 
 	this.x += this.vx;
+}
+
+game.monster.prototype.draw = function() {
+	this.updator();
 
 	game.context.fillStyle = "rgba(0,0,0,0.9)"
 	game.context.fillRect(this.x, this.y, game.tileSize, game.tileSize);
@@ -295,7 +318,7 @@ game.player = {
 	vy: 0,
 	vx: 0,
 	x: 10,
-	y: 200,
+	y: 250,
 	w: game.tileSize,
 	h: game.tileSize,
 	isJumping: false,
@@ -325,6 +348,10 @@ game.player = {
 
 		this.vy += 0.98;
 
+		if(this.vy > 16) {
+			this.vy = 16;
+		}
+
 		if(this.vy > 0) {
 			this.isJumping = false;
 		}
@@ -332,14 +359,27 @@ game.player = {
 		var tX = Math.floor(game.player.x / game.tileSize);
 		var tY = Math.floor(game.player.y / game.tileSize);
 
-		// Hits roof, allow jumping above screen
+		var minY = (tY)*game.tileSize;
+		var maxY = (tY)*game.tileSize;
+
+		var isHittingGround = false;
+
+		// Allow jumping "above" screen
 		if(!game.tiles[tY-1]) {
 
 		} else {
 			if(!this.isJumping)
 			{
-				if(game.tiles[tY+1][tX] != 0 || game.tiles[tY+1][tX+1] != 0) {
-					this.y = tY*game.tileSize;
+				if(this.isGrounded) {
+
+					if(this.isHittingGround(this.y)) {
+						this.vy = 0;
+					} else {
+						this.isGrounded = false;
+					}
+				}
+				else if(!this.isGrounded && this.isHittingGround(this.y + this.vy)) {
+					this.y = (tY+1)*game.tileSize;
 					this.vy = 0;
 					this.isGrounded = true;
 				}	
@@ -381,8 +421,6 @@ game.player = {
 		this.y += this.vy;
 		this.x += this.vx;
 
-		this.isHittingSea();
-
 		if(game.monsters.hit() || this.isHittingSea()) {
 			this.die();
 			return;
@@ -412,6 +450,12 @@ game.player = {
 		} else {
 			this.currentSprite = 0;
 		}
+	},
+	isHittingGround: function(y) {
+		var tX = Math.floor(game.player.x / game.tileSize);
+		var tY = Math.floor(y / game.tileSize);
+
+		return (game.tiles[tY+1][tX] != 0 || game.tiles[tY+1][tX+1] != 0)
 	},
 	isHittingSea: function() {
 		var tX = Math.floor(game.player.x / game.tileSize);
