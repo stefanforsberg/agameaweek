@@ -152,6 +152,7 @@ game.setup = function() {
     game.background.init();
     game.pickableItems.init();
     game.monsters.init();
+    game.player.init();
 
     game.setupTileData();
     game.setupObjects();
@@ -394,14 +395,16 @@ game.player = {
 	h: game.tileSize,
 	isJumping: false,
 	isGrounded: false,
-	currentSprite: 0,
+	currentSpriteIndex: 0,
+	currentSprite: {},
 	runSprites: 8,
 	sprite: document.getElementById("player"),
+	spritel: document.getElementById("playerl"),
 	previous: [],
 	isAlive: true,
 
 	init: function() {
-
+		this.currentSprite = this.sprite;
 	},
 	jump: function() {
 
@@ -507,18 +510,25 @@ game.player = {
 			game.offsetX-=4;
 		}
 
-		if(this.vy !== 0) {
-			this.currentSprite = this.runSprites;
+
+		if(this.vx > 0 ) {
+			this.currentSprite = this.sprite;
+		} else if(this.vx < 0) {
+			this.currentSprite = this.spritel;
 		}
-		else if(this.vx > 0 || this.vy > 0) {
+
+		if(this.vy !== 0) {
+			this.currentSpriteIndex = this.runSprites;
+		}
+		else if(this.vx !== 0 || this.vy !== 0) {
 			if(t % 4 === 0) {
-				this.currentSprite++;
-				if(this.currentSprite > (this.runSprites-1)) {
-					this.currentSprite = 0;
+				this.currentSpriteIndex++;
+				if(this.currentSpriteIndex > (this.runSprites-1)) {
+					this.currentSpriteIndex = 0;
 				}	
 			}
 		} else {
-			this.currentSprite = 0;
+			this.currentSpriteIndex = 0;
 		}
 	},
 	isHittingGround: function(y) {
@@ -573,7 +583,7 @@ game.player = {
 	},
 	die: function() {
 		this.isAlive = false;
-		this.currentSprite = 9;
+		this.currentSpriteIndex = 9;
 
 		game.context.font="50px Arial";
 		game.context.textAlign="center"; 
@@ -591,8 +601,8 @@ game.player = {
 				game.context.restore();
 			}
 		}
-
-		game.context.drawImage(this.sprite, [this.currentSprite*game.tileSize], 0, game.tileSize, game.tileSize, this.x, this.y, game.tileSize, game.tileSize);
+		console.log(this.currentSprite)
+		game.context.drawImage(this.currentSprite, [this.currentSpriteIndex*game.tileSize], 0, game.tileSize, game.tileSize, this.x, this.y, game.tileSize, game.tileSize);
 	}
 }
 
