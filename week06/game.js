@@ -173,7 +173,7 @@ game.background = {
 		if(this.treesColored && this.treesColoredCompleted < 100) {
 			game.context.globalAlpha = 1- (this.treesColoredCompleted / 100);
 			game.context.drawImage(game.background.trees, -relativePosition, 0);
-			
+
 			game.context.globalAlpha = this.treesColoredCompleted / 100;
 			game.context.drawImage(game.background.treesColor, -relativePosition, 0)
 
@@ -292,35 +292,44 @@ game.setup = function() {
 
 	})
 
-	game.pauser.onNext(true);
+	game.sounds = [];
 
-	// game.sounds = [];
+	game.sounds[1] = new Howl({
+  		urls: ['song.mp3'],
+  		loop: true,
+  		onload: function() {
 
-	// game.sounds[1] = new Howl({
- //  		urls: ['level1.mp3'],
- //  		loop: true,
- //  		onload: function() {
- //  			game.sounds[2] =new Howl({
-	// 	  		urls: ['level2.mp3'],
-	// 	  		loop: true,
-	// 	  		onload: function() {
-	// 	  			game.sounds[3] =new Howl({
-	// 			  		urls: ['level3.mp3'],
-	// 			  		loop: true,
-	// 			  		onload: function() {
-	// 			  			game.sounds[4] =new Howl({
-	// 					  		urls: ['level4.mp3'],
-	// 					  		loop: true,
-	// 					  		onload: function() {
-	// 					  			game.initLevel(1);
-	// 					  		}
-	// 			  			})
-	// 	  				}
-	// 	  			})
- 	//  				}
-	// 		})
-	// 	}
-	// })
+  			game.sounds[2] = new Howl({
+  				urls: ['fx.mp3'],
+  				sprite: {
+			    	die: [0, 2700],
+				    item: [3150, 300],
+				    door: [4410, 300]
+			  	},
+		  		onload: function() {
+		  			Rx.Observable
+						.timer(500, 1000)
+						.map(function (i) {
+							return (5 - i);
+						})
+						.take(6)
+						.subscribe(function(i) {
+							game.context.clearRect(0, 0, game.width, game.height);
+							game.context.drawImage(document.getElementById("start"), 0, 0)
+					  		game.context.font = "60px Arial";
+							game.context.textAlign="center"; 
+							game.context.fillText(i,game.width/2,300); 
+						}, 
+						function (err) {
+						},
+						function () {
+							game.sounds[1].play();
+							game.pauser.onNext(true);
+						});
+					}		  			
+  			})
+  		}
+	})
 }
 
 game.load = function() {
@@ -383,6 +392,7 @@ game.key.prototype.draw = function() {
 		if(game.collides(this, game.player)) {
 			game.inventory.keys++;
 			this.isActive = false;
+			game.sounds[2].play("item");
 		}
 
 		game.context.drawImage(this.sprite, this.x, this.y);	
@@ -406,6 +416,7 @@ game.door.prototype.draw = function() {
 			if(game.inventory.keys === 0) {
 				game.player.x -= 20;
 			} else {
+				game.sounds[2].play("door");
 				game.inventory.keys--;
 				this.isActive = false;
 			}
@@ -431,6 +442,7 @@ game.bucketTree.prototype.draw = function() {
 		if(game.collides(this, game.player)) {
 			this.isActive = false;
 			game.background.colorTrees();
+			game.sounds[2].play("item");
 		}
 
 		game.context.drawImage(this.sprite, this.x, this.y);	
@@ -696,6 +708,9 @@ game.player = {
 	die: function() {
 		this.isAlive = false;
 		this.currentSpriteIndex = 9;
+
+		game.sounds[1].stop();
+		game.sounds[2].play("die");
 
 		game.context.font="50px Arial";
 		game.context.textAlign="center"; 
