@@ -56,8 +56,10 @@ game.setupObjects = function() {
 			game.monsters.items.push(new game.monster(o.x, o.y, parseFloat(o.properties.vx), parseFloat(o.properties.vy), parseInt(o.properties.minY), parseInt(o.properties.maxY)));
 		} else if(o.type === "key") {
 			game.pickableItems.items.push(new game.key(o.x, o.y));			
-		} if(o.type === "door") {
+		} else if(o.type === "door") {
 			game.pickableItems.items.push(new game.door(o.x, o.y));			
+		} else if(o.type === "bucket_tree") {
+			game.pickableItems.items.push(new game.bucketTree(o.x, o.y));			
 		}
 
 	});
@@ -68,8 +70,12 @@ game.inventory = {
 }
 
 game.background = {
-
+	treesColored: false,
+	treesColoredCompleted: 0,
 	init: function() {
+		treesColored = false;
+		treesColoredCompleted = 0;
+
 		game.background.mountains1 = document.createElement('canvas');
 	    game.background.mountains1.width = 1200;
 	    game.background.mountains1.height = 480;
@@ -126,22 +132,28 @@ game.background = {
 	    	var height = 85+95*Math.random();
 
 	    	if(Math.random() < 0.5) {
+	    		var leafRadius = 10+Math.random()*40
 	    		canvas.fillRect(i*distance, 480 , width, -height)
-				canvas.arc(i*distance + width/2, 480-height, 10+Math.random()*40, 0, 2 * Math.PI, false);	
+				canvas.arc(i*distance + width/2, 480-height, leafRadius, 0, 2 * Math.PI, false);	
 
 				canvasColor.fillStyle = "#C47538"
 				canvasColor.fillRect(i*distance, 480 , width, -height)
 				canvasColor.fillStyle = treeColor;
-				canvasColor.arc(i*distance + width/2, 480-height, 10+Math.random()*40, 0, 2 * Math.PI, false);					
+				canvasColor.arc(i*distance + width/2, 480-height, leafRadius, 0, 2 * Math.PI, false);					
 	    	} else {
-	    		canvas.arc(i*distance, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
-	    		canvas.arc(i*distance + width/2, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
-	    		canvas.arc(i*distance + width, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
+
+	    		var bushRadius1 = 20+Math.random()*40;
+	    		var bushRadius2 = 20+Math.random()*40;
+	    		var bushRadius3 = 20+Math.random()*40;
+
+	    		canvas.arc(i*distance, 480, bushRadius1, 0, 2 * Math.PI, false);	
+	    		canvas.arc(i*distance + width/2, 480, bushRadius2, 0, 2 * Math.PI, false);	
+	    		canvas.arc(i*distance + width, 480, bushRadius3, 0, 2 * Math.PI, false);	
 
 	    		canvasColor.fillStyle = treeColor;
-	    		canvasColor.arc(i*distance, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
-	    		canvasColor.arc(i*distance + width/2, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
-	    		canvasColor.arc(i*distance + width, 480, 20+Math.random()*40, 0, 2 * Math.PI, false);	
+	    		canvasColor.arc(i*distance, 480, bushRadius1, 0, 2 * Math.PI, false);	
+	    		canvasColor.arc(i*distance + width/2, 480, bushRadius2, 0, 2 * Math.PI, false);	
+	    		canvasColor.arc(i*distance + width, 480, bushRadius3, 0, 2 * Math.PI, false);	
 	    	}
 	    	canvas.fill();
 	    	canvasColor.fill();
@@ -156,7 +168,29 @@ game.background = {
 		game.context.drawImage(game.background.mountains1, -relativePosition, 0)
 
 		relativePosition = (game.background.trees.width - game.width) * (game.offsetX / map.naturalWidth)
-		game.context.drawImage(game.background.treesColor, -relativePosition, 0)
+
+
+		if(this.treesColored && this.treesColoredCompleted < 100) {
+			game.context.globalAlpha = 1- (this.treesColoredCompleted / 100);
+			game.context.drawImage(game.background.trees, -relativePosition, 0);
+			
+			game.context.globalAlpha = this.treesColoredCompleted / 100;
+			game.context.drawImage(game.background.treesColor, -relativePosition, 0)
+
+			game.context.globalAlpha = 1;
+			this.treesColoredCompleted++;
+		} else if(this.treesColoredCompleted === 100) {
+			game.context.drawImage(game.background.treesColor, -relativePosition, 0)
+		} else {
+			game.context.drawImage(game.background.trees, -relativePosition, 0)
+		}
+	},
+	colorTrees: function() {
+		this.treesColored = true;
+
+		//Rx.Observable.interval(33).take(100).subscribe(function() {
+			//game.context.drawImage(game.background.treesColor, -relativePosition, 0)
+		//});
 	}
 }
 
@@ -228,7 +262,9 @@ game.setup = function() {
 			}
 		});
 
-	Rx.Observable.interval(33).subscribe(function (t) {
+	game.pauser = new Rx.Subject();
+
+	Rx.Observable.interval(33).pausable(game.pauser).subscribe(function (t) {
 
 		if(!game.player.isAlive) {
 			return;
@@ -255,6 +291,8 @@ game.setup = function() {
 
 
 	})
+
+	game.pauser.onNext(true);
 
 	// game.sounds = [];
 
@@ -377,6 +415,28 @@ game.door.prototype.draw = function() {
 	}
 }
 
+game.bucketTree = function(x,y) {
+	this.x = x;
+	this.y = y;
+	this.w = game.tileSize;
+	this.h = game.tileSize*3;
+	this.sprite = document.getElementById("bucketTree");
+	this.isActive = true;
+	return this;	
+}
+
+game.bucketTree.prototype.draw = function() {
+	if(game.isOnScreen(this) && this.isActive) {
+
+		if(game.collides(this, game.player)) {
+			this.isActive = false;
+			game.background.colorTrees();
+		}
+
+		game.context.drawImage(this.sprite, this.x, this.y);	
+	}
+}
+
 game.monster = function(x, y, vx, vy, minY, maxY) {
 
 	this.x = x;
@@ -441,8 +501,8 @@ game.monster.prototype.draw = function() {
 game.player = {
 	vy: 0,
 	vx: 0,
-	x: 32,
-	y: 250,
+	x: 10,
+	y: 0,
 	w: game.tileSize,
 	h: game.tileSize,
 	isJumping: false,
@@ -556,7 +616,7 @@ game.player = {
 			y: this.y - game.offsetY,
 		} 
 
-		if(relativeScreenPosition.x > 400) {
+		if(relativeScreenPosition.x > 400 && game.offsetX < (game.map.width-game.width))  {
 			game.offsetX+=4;
 		} else if(relativeScreenPosition.x < 172 && game.offsetX >= 4) {
 			game.offsetX-=4;
