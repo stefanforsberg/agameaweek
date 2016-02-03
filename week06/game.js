@@ -300,7 +300,7 @@ game.setup = function() {
   		onload: function() {
 
   			game.sounds[2] = new Howl({
-  				urls: ['fx.mp3'],
+  				urls: ['sfx.mp3'],
   				sprite: {
 			    	die: [0, 2700],
 				    item: [3150, 300],
