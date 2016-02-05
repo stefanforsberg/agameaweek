@@ -60,6 +60,8 @@ game.setupObjects = function() {
 			game.pickableItems.items.push(new game.door(o.x, o.y));			
 		} else if(o.type === "bucket_tree") {
 			game.pickableItems.items.push(new game.bucketTree(o.x, o.y));			
+		} else if(o.type === "portal") {
+			game.pickableItems.items.push(new game.portal(o.x, o.y));			
 		}
 
 	});
@@ -304,7 +306,8 @@ game.setup = function() {
   				sprite: {
 			    	die: [0, 2700],
 				    item: [3150, 300],
-				    door: [4410, 300]
+				    door: [4410, 300],
+				    win: [5040, 8000]
 			  	},
 		  		onload: function() {
 		  			Rx.Observable
@@ -325,6 +328,7 @@ game.setup = function() {
 						function () {
 							game.sounds[1].play();
 							game.pauser.onNext(true);
+							game.start = new Date();
 						});
 					}		  			
   			})
@@ -449,6 +453,82 @@ game.bucketTree.prototype.draw = function() {
 	}
 }
 
+game.portal = function(x,y) {
+	this.x = x;
+	this.y = y;
+	this.w = game.tileSize;
+	this.h = game.tileSize;
+	this.sprite = document.getElementById("bucketTree");
+
+	this.isActive = true;
+	this.sparkles = [];
+	for(var i = 0; i < 50; i++) {
+		this.sparkles.push(new game.sparkle(this.x, this.y))	
+	}
+	return this;	
+}
+
+game.portal.prototype.draw = function() {
+	if(game.isOnScreen(this) && this.isActive) {
+
+		if(game.collides(this, game.player)) {
+
+			if(game.background.treesColored) {
+				game.player.currentSpriteIndex = 8;
+				game.sounds[1].stop();
+				game.sounds[2].play("win");
+				game.pauser.onNext(false);
+
+				var elapsed = new Date() - game.start;
+
+				game.context.font="48px Arial";
+				game.context.textAlign="center"; 
+				game.context.fillStyle="#000000";
+				game.context.fillText("Thank you!",game.offsetX + 320, 220);
+
+				game.context.font="25px Arial";
+				game.context.fillText("Time spent: " + (elapsed/1000).toFixed(2) + " seconds",game.offsetX + 320, 270);
+			}
+		}
+
+		if(game.background.treesColored) {
+			this.sparkles.forEach(function (i) {
+				i.draw();
+			});		
+		}	
+
+		game.context.fillStyle = "rgba(255,255,255,0.7)"
+		game.context.fillRect(this.x, this.y, game.tileSize, game.tileSize);
+	}
+}
+
+game.sparkle = function(x, y) {
+	this.size = 14 + 5*Math.random();
+	this.startX = x + this.size/2;
+	this.startY = y + this.size/2;
+	this.x = this.startX;
+	this.y = this.startY;
+	this.vx = -1 + 2*Math.random();
+	this.vy = -1 + 2*Math.random();
+	this.alpha = Math.random()/2;
+	this.color = "rgba(" + Math.round(Math.random()*255) + "," + Math.round(Math.random()*255) + "," + Math.round(Math.random()*255) + ",";
+}
+
+game.sparkle.prototype.draw = function() {
+	game.context.fillStyle = this.color + this.alpha + ")";
+	game.context.fillRect(this.x, this.y, this.size, this.size);	
+
+	this.x += this.vx;
+	this.y += this.vy;
+	this.alpha -= 0.005;
+
+	if(this.alpha <= 0) {
+		this.alpha = Math.random()/2;
+		this.x = this.startX;
+		this.y = this.startY;
+	}
+}
+
 game.monster = function(x, y, vx, vy, minY, maxY) {
 
 	this.x = x;
@@ -532,8 +612,6 @@ game.player = {
 	},
 	jump: function() {
 
-		console.log("jump")
-
 		if(this.isGrounded) {
 			this.vy = -15;
 			this.isJumping = true;
@@ -587,7 +665,6 @@ game.player = {
 			} else {
 
 				if(this.isHittingCeiling(this.y + this.vy)) {
-					console.log("hits roof");
 					this.y = tY*game.tileSize;
 					this.vy = 0.98;
 				}		
@@ -712,10 +789,14 @@ game.player = {
 		game.sounds[1].stop();
 		game.sounds[2].play("die");
 
-		game.context.font="50px Arial";
+		game.context.font="48px Arial";
 		game.context.textAlign="center"; 
 		game.context.fillStyle="#000000";
-		game.context.fillText("You are dead.",game.offsetX + 320, 220);
+		game.context.fillText("You can still color the world!",game.offsetX + 320, 220);
+
+		game.context.font="25px Arial";
+		game.context.fillText("Try again with ctrl-r",game.offsetX + 320, 270);
+		
 	},
 	draw: function() {
 
