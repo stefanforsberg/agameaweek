@@ -1,0 +1,72 @@
+<!-- https://www.youtube.com/watch?v=mclnKsJeJEo -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>A few shades of grey</title>
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+			color: #606060;
+		}
+
+		h1 {
+			font-family: 'Oswald', sans-serif;
+			color: #7560FF;
+			text-transform: uppercase;
+			font-size: 48px;
+			margin-top: 10px;
+			margin-bottom: 10px;
+		}
+
+		.container {
+			width: 100%;
+		}
+
+		#game {
+ 			position: absolute;
+		    width: 1600px;
+		    height: 650px;
+		    border: solid 1px #c2c2c2;
+		}
+
+
+		
+	</style>
+
+	<link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+	<div class="container">
+		<canvas id="game" width="1600" height="600"></canvas>
+	</div>
+
+	<img src="bg.png" id="bg" style="display: none;">
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+
+	<script>
+		var game = game || {};
+
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(game.load());
+
+
+	</script>
+
+</body>
+
+</html>
+
