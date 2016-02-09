@@ -13,9 +13,14 @@ game.draw = function() {
 
 	game.context.drawImage(document.getElementById("bg"), 0, 0);
 
+	game.environment.draw();
+
 	game.trees.forEach(function (t) {
 		t.draw();
 	})
+
+	
+
 
 	window.requestAnimationFrame(game.draw);
 }
@@ -33,9 +38,139 @@ game.load = function() {
 
 	game.trees.push(new game.tree(1350, 650));
 
+	game.environment.init();
+
 	game.draw();
 	
 }
+
+game.glowWorm = function() {
+	this.colors = ["rgba(99,203,230, 0.3)", "rgba(255,216,0, 0.3)"];
+
+	this.reset();
+
+	return this;
+}
+
+game.glowWorm.prototype.reset = function() {
+	this.vx = 0.2*(Math.random()-1);
+	this.vy = 0.05*(Math.random()-1);
+	this.radius = 1 + Math.random()*3;
+	this.x = Math.random()*1600;
+	this.y = Math.random()*650;
+	this.a = Math.random()*360;
+	this.divergence = Math.random()*3;
+	this.color = this.colors[Math.floor(this.colors.length*Math.random())];
+}
+
+game.glowWorm.prototype.draw = function() {
+
+
+
+}
+
+game.environment = {
+
+	glowWorms: [],
+	minutes: 0,
+	tick: 0,
+
+	init: function() {
+
+		this.tick = 0;
+		this.minutes = 1020;
+
+		for(var i = 0; i < 200; i++) {
+			this.glowWorms.push(new game.glowWorm());
+		}
+
+		
+
+		this.canvas = document.createElement('canvas');
+		this.canvas.width = game.width;
+		this.canvas.height = game.height;
+		this.ctx = this.canvas.getContext("2d");
+	},
+
+	draw: function() {
+
+		this.ctx.clearRect(0,0,game.width, game.height);
+
+		this.tick++;
+
+		if(this.tick % 10 === 0) {
+			this.minutes++;
+
+			if(this.minutes > 1440) {
+				this.minutes = 0;
+			}
+		}
+
+		var alpha;
+
+		if(this.minutes >= 0 && this.minutes < 120) {
+			alpha = 0.8;
+		}
+		else if(this.minutes >= 120 && this.minutes < 600) {
+			alpha = 0.8*Math.abs((this.minutes - 600) / 480);
+		}  else if(this.minutes > 1080) {
+			alpha =  0.8 - 0.8*Math.abs((this.minutes - 1440 ) / (1440-1080)) ;
+		} else {
+			alpha = 0;
+		}
+
+		this.ctx.fillStyle = "rgba(0, 0, 0, " +alpha + ")";
+		this.ctx.fillRect(0, 0, game.width, game.height);
+
+		game.context.drawImage(this.canvas, 0 , 0);
+
+		// if(this.clock > 22) {
+		// 	this.glowWorm();
+		// }
+	},
+	glowWorm: function() {
+		this.ctx.globalCompositeOperation = "source-over";
+		//Lets reduce the opacity of the BG paint to give the final touch
+
+
+		this.ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+		this.ctx.fillRect(0, 0, game.width, game.height);
+
+		
+		//Lets blend the particle with the BG
+		this.ctx.globalCompositeOperation = "lighter";
+		
+		//Lets draw particles from the array now
+		for(var t = 0; t < this.glowWorms.length; t++)
+		{
+			var p = this.glowWorms[t];
+			
+			this.ctx.beginPath();
+			
+			//Time for some colors
+			var gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+			gradient.addColorStop(0, "white");
+			gradient.addColorStop(0.2, "white");
+			gradient.addColorStop(0.4, p.color);
+			gradient.addColorStop(1, "transparent");
+			
+			this.ctx.fillStyle = gradient;
+			this.ctx.arc(p.x, p.y, p.radius, Math.PI*2, false);
+			this.ctx.fill();
+
+			p.x += p.vx + 0.01*Math.cos(p.a*Math.PI/180)*p.divergence;
+			p.y += p.vy + 0.006*Math.sin(p.a*Math.PI/180)*p.divergence;
+
+			p.a+= p.divergence/3;
+		}
+
+		
+
+		game.context.globalAlpha = 1;
+	}
+}
+
+
 
 game.tree = function(x, h) {
 
@@ -47,8 +182,8 @@ game.tree = function(x, h) {
 
 	this.generations = [];
 
-	this.length = 80 +  Math.round(Math.random()*30)
-	this.divergence = 25 + Math.round(Math.random()*10)
+	this.length = 80 +  Math.round(Math.random()*35)
+	this.divergence = 15 + Math.round(Math.random()*20)
 	this.reduction = 0.70 + Math.random()*5/100
 
 	this.isReady = false;
@@ -217,59 +352,6 @@ game.tree.prototype.generate = function(h, generation) {
 }
 
 
-// //Lets draw the branches now
-// 	function branches(h)
-// 	{
-// 		console.log(start_points);
-		
-
-// 		//reducing line_width and length
-// 		length = length * reduction;
-// 		line_width = line_width * reduction;
-// 		game.context.lineWidth = line_width;
-		
-// 		var new_start_points = [];
-// 		game.context.beginPath();
-// 		for(var i = 0; i < start_points.length; i++)
-// 		{
-// 			var sp = start_points[i];
-// 			//2 branches will come out of every start point. Hence there will be
-// 			//2 end points. There is a difference in the divergence.
-// 			var ep1 = get_endpoint(sp.x, sp.y, sp.angle+this.divergence, this.length);
-// 			var ep2 = get_endpoint(sp.x, sp.y, sp.angle-this.divergence, this.length);
-			
-// 			//drawing the branches now
-// 			game.context.moveTo(sp.x, h-sp.y);
-// 			game.context.lineTo(ep1.x, h-ep1.y);
-
-// 			game.context.moveTo(sp.x, h-sp.y);
-// 			game.context.lineTo(ep2.x, h-ep2.y);
-			
-// 			//Time to make this function recursive to draw more branches
-// 			ep1.angle = sp.angle+divergence;
-// 			ep2.angle = sp.angle-divergence;
-			
-// 			new_start_points.push(ep1);
-// 			new_start_points.push(ep2);
-// 		}
-
-// 		var colors = ["#778B71", "#8EA886", "#ADC7A6"];
-
-// 		//Lets add some more color
-// 		if(length < 20) {
-// 			game.context.strokeStyle = colors[Math.floor(Math.random()*colors.length)];
-// 		}
-// 		else {
-// 			game.context.strokeStyle = "#925c00";
-// 		}
-// 		game.context.stroke();
-// 		start_points = new_start_points;
-// 		//recursive call - only if length is more than 2.
-// 		//Else it will fall in an long loop
-// 		if(length > 2) branches(h);
-// 		//else setTimeout(init, 500);
-// 	}
-	
 	function get_endpoint(x, y, a, length)
 	{
 		//This function will calculate the end points based on simple vectors
