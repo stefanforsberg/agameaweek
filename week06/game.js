@@ -19,8 +19,9 @@ game.draw = function() {
 		t.draw();
 	})
 
-	
+	game.context.drawImage(document.getElementById("icons_top"), 650, 20);
 
+	game.tools.draw();
 
 	window.requestAnimationFrame(game.draw);
 }
@@ -37,11 +38,54 @@ game.load = function() {
 	game.trees.push(new game.tree(800, 650));
 
 	game.trees.push(new game.tree(1350, 650));
-
+	
 	game.environment.init();
+
+	game.tools.init();
 
 	game.draw();
 	
+}
+
+game.tools = {
+	currentTool:null,
+	currentPos: {},
+	iconWater: document.getElementById("icon_water"),
+	iconLeaf: document.getElementById("icon_leaf"),
+	iconFood: document.getElementById("icon_food"),
+	init: function() {
+		var self = this;
+
+		this.currentTool = null;
+		this.currentPos = {};
+
+		Rx.Observable.fromEvent(game.canvas, 'click').map(game.mapForMouseCoords).subscribe(function(m) {
+			console.log(m);
+			if(m.x > 673 && m.x < 755 && m.y > 60 && m.y < 125) {
+				self.currentTool = self.iconWater;
+			} else if(m.x > 785 && m.x < 820 && m.y > 37 && m.y < 82) {
+				self.currentTool = self.iconFood;
+			} else if(m.x > 855 && m.x < 900 && m.y > 54 && m.y < 140) {
+				self.currentTool = self.iconLeaf;
+			} 
+		});
+
+		Rx.Observable.fromEvent(game.canvas, 'mousemove').map(game.mapForMouseCoords).subscribe(function(m) {
+			self.currentPos = {
+				x: m.x - 42,
+				y: m.y - 60
+			};
+		});
+	},
+	draw: function() {
+		
+		if(this.currentTool) {
+			game.context.globalAlpha = 0.3;
+			game.context.drawImage(this.currentTool, this.currentPos.x, this.currentPos.y);
+			game.context.globalAlpha = 1;
+		}
+		
+	}
 }
 
 game.glowWorm = function() {
@@ -84,8 +128,6 @@ game.environment = {
 			this.glowWorms.push(new game.glowWorm());
 		}
 
-		
-
 		this.canvas = document.createElement('canvas');
 		this.canvas.width = game.width;
 		this.canvas.height = game.height;
@@ -124,9 +166,6 @@ game.environment = {
 
 		game.context.drawImage(this.canvas, 0 , 0);
 
-		// if(this.clock > 22) {
-		// 	this.glowWorm();
-		// }
 	},
 	glowWorm: function() {
 		this.ctx.globalCompositeOperation = "source-over";
@@ -174,8 +213,9 @@ game.environment = {
 
 game.tree = function(x, h) {
 
+	this.x = x;
 	this.canvases = [];
-
+	this.statuses = []
 	this.currentGeneration = 5;
 	this.currentGenerationLife = 0;
 	this.lifeForce = 1000;
@@ -216,8 +256,6 @@ game.tree = function(x, h) {
 	this.canvases.push(canvas);
 	
 	this.generate(h,1);
-
-
 }
 
 
@@ -259,15 +297,35 @@ game.tree.prototype.draw  = function() {
 	}
 
 	try {
-			game.context.globalAlpha = this.currentGenerationLife/100;
-			game.context.drawImage(this.canvases[this.currentGeneration], 0, 0);
-			game.context.globalAlpha = 1;
+		game.context.globalAlpha = this.currentGenerationLife/100;
+		game.context.drawImage(this.canvases[this.currentGeneration], 0, 0);
+		game.context.globalAlpha = 1;
 	} catch(err) {
 		console.log("error: " + this.canvases.length + ", " + this.currentGeneration);
 	}
 
+	if(Math.random() < 0.001) {
+		this.statuses.push(new game.treeStatus(this.x))
+	}
 
+	this.statuses.forEach(function (o) {
+		o.draw();
+	});
+	
+}
 
+game.treeStatus = function(x) {
+	this.x = x - 20 -150 + Math.random()*300;
+	this.y = 380 + Math.random()*180;
+	this.sprite = document.getElementById("icon_water_small");
+
+	return this;
+}
+
+game.treeStatus.prototype.draw = function() {
+	game.context.globalAlpha = 0.7;
+	game.context.drawImage(this.sprite, this.x, this.y);
+	game.context.globalAlpha = 1;
 }
 
 game.tree.prototype.generate = function(h, generation) {
@@ -352,12 +410,19 @@ game.tree.prototype.generate = function(h, generation) {
 }
 
 
-	function get_endpoint(x, y, a, length)
-	{
-		//This function will calculate the end points based on simple vectors
-		//http://physics.about.com/od/mathematics/a/VectorMath.htm
-		//You can read about basic vectors from this link
-		var epx = x + length * Math.cos(a*Math.PI/180);
-		var epy = y + length * Math.sin(a*Math.PI/180);
-		return {x: epx, y: epy};
-	}
+function get_endpoint(x, y, a, length)
+{
+	//This function will calculate the end points based on simple vectors
+	//http://physics.about.com/od/mathematics/a/VectorMath.htm
+	//You can read about basic vectors from this link
+	var epx = x + length * Math.cos(a*Math.PI/180);
+	var epy = y + length * Math.sin(a*Math.PI/180);
+	return {x: epx, y: epy};
+}
+
+game.mapForMouseCoords = function(m) {
+	return {
+		x: (m.pageX - game.canvas.offsetLeft),
+		y: (m.pageY - game.canvas.offsetTop)
+	};
+}
