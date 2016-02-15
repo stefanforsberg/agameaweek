@@ -14,7 +14,7 @@
    id="svg3222"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="icon_leaf.svg">
+   sodipodi:docname="icon_leaf_small.svg">
   <defs
      id="defs3224" />
   <sodipodi:namedview
@@ -43,7 +43,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,6 +52,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-1007.3622)">
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:0.79365079;stroke:none"
+       id="path3015"
+       sodipodi:cx="-36.785713"
+       sodipodi:cy="-66.785713"
+       sodipodi:rx="21.071428"
+       sodipodi:ry="21.071428"
+       d="m -15.714285,-66.785713 a 21.071428,21.071428 0 1 1 -42.142856,0 21.071428,21.071428 0 1 1 42.142856,0 z"
+       transform="translate(59.28571,1095.9334)" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1.62407279;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 14.364862,1042.123 c -0.0083,-0.018 -0.01397,-0.037 -0.02227,-0.055 -0.0016,-3e-4 -0.0026,-0 -0.0041,-0 -6.9282939,-15.359 17.890203,-25.2082 19.564198,-25.8523 0.107532,-0.045 0.15846,-0.087 0.07606,0.051 -0.101987,1.7071 -2.003162,28.8616 -19.580382,25.8148 z"

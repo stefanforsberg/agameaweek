@@ -14,7 +14,7 @@
    id="svg3222"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="icon_food_small.svg">
+   sodipodi:docname="icon_water_small.svg">
   <defs
      id="defs3224" />
   <sodipodi:namedview
@@ -25,8 +25,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="131.10573"
-     inkscape:cy="137.48737"
+     inkscape:cx="75.391444"
+     inkscape:cy="59.273084"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -43,7 +43,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,6 +52,16 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-1007.3622)">
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:0.79365081;stroke:none"
+       id="path3015"
+       sodipodi:cx="-36.785713"
+       sodipodi:cy="-66.785713"
+       sodipodi:rx="21.071428"
+       sodipodi:ry="21.071428"
+       d="m -15.714285,-66.785713 a 21.071428,21.071428 0 1 1 -42.142856,0 21.071428,21.071428 0 1 1 42.142856,0 z"
+       transform="translate(60,1096.2908)" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:none"
        d="m 29.358927,1027.2518 c -0.0039,0 -0.0079,0 -0.0119,-0.011 -1.1e-5,-3e-4 -5.09e-4,-7e-4 -6.79e-4,0 -3.324356,-1.7328 -5.825251,3.656 -5.989442,4.0197 -0.01144,0.024 -0.02125,0.034 0.01033,0.017 0.380507,0 6.436411,-0.081 5.9813,-4.0238 z"
