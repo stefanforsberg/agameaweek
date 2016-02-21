@@ -54,6 +54,8 @@ game.load = function() {
 
 game.init = function() {
 
+	game.statusProbability = 0.001;
+
 	game.sounds[0].fadeIn(0.3, 20000);
 	game.sounds[1].fadeIn(0.3, 20000);
 
@@ -192,6 +194,11 @@ game.environment = {
 		this.glowWorms.length = 0;
 
 		for(var t = 0; t < game.trees.length; t++) {
+
+			if(!game.trees[t].alive || game.trees[t].currentGeneration < 8) {
+				continue;
+			}
+
 			for(var i = 0; i < 100; i++) {
 				this.glowWorms.push(new game.glowWorm(game.trees[t].x, game.trees[t].lastHeight));
 			}
@@ -203,12 +210,13 @@ game.environment = {
 
 		this.tick++;
 
-		if(this.tick % 5 === 0) {
+		if(this.tick % 2 === 0) {
 			this.minutes++;
 
 			if(this.minutes > 1440) {
 				this.minutes = 0;
 				this.day++;
+				game.statusProbability = game.statusProbability*2;
 			}
 		}
 
@@ -243,14 +251,14 @@ game.environment = {
 		game.context.drawImage(this.canvas, 0 , 0);
 		this.drawClock();
 
-		if(this.minutes === 420) {
-			game.sounds[1].fadeIn(0.3, 10000);
-			game.sounds[2].fadeOut(0, 10000);
+		if(this.minutes === 300) {
+			game.sounds[1].fadeIn(0.3, 5000);
+			game.sounds[2].fadeOut(0, 5000);
 		}
 
 		if(this.minutes === 1140) {
-			game.sounds[2].fadeIn(0.3, 10000);
-			game.sounds[1].fadeOut(0, 10000);
+			game.sounds[2].fadeIn(0.3, 5000);
+			game.sounds[1].fadeOut(0, 5000);
 		}
 
 		
@@ -292,7 +300,6 @@ game.environment = {
 
 		for(var t = 0; t < this.glowWorms.length; t++)
 		{
-
 
 			if(this.minutes > 120 && this.minutes < 300) {
 				this.glowWormAlpha -= 0.000005;
@@ -343,6 +350,7 @@ game.tree = function(x, h) {
 	this.currentGeneration = 5;
 	this.currentGenerationLife = 0;
 	this.lifeForce = 1000;
+	this.alive = true;
 
 	this.generations = [];
 
@@ -353,17 +361,10 @@ game.tree = function(x, h) {
 	this.isReady = false;
 
 	this.lineWidth = 10;
-	
-	//This is the end point of the trunk, from where branches will diverge
-	
 
 	var trunk = {x: x, y: this.length+50, angle: 90};
-		//It becomes the start point for branches
-		this.start_points = []; //empty the start points on every init();
+		this.start_points = []; 
 		this.start_points.push(trunk);
-
-	//Y coordinates go positive downwards, hence they are inverted by deducting it
-	//from the canvas height = H
 
 	var canvas = document.createElement('canvas');
 	canvas.width = game.width;
@@ -378,6 +379,18 @@ game.tree = function(x, h) {
 	ctx.stroke();
 
 	this.canvases.push(canvas);
+
+	this.canvasDead = document.createElement('canvas');
+	this.canvasDead.width = game.width;
+	this.canvasDead.height = game.height;
+	ctx = this.canvasDead.getContext("2d");
+
+	ctx.drawImage(canvas, 0, 0);
+	ctx.moveTo(trunk.x-40, h-trunk.y+30);
+	ctx.lineTo(trunk.x+40, h-trunk.y+30);
+	ctx.strokeStyle = "#925c00";
+	ctx.lineWidth = this.lineWidth;
+	ctx.stroke();	
 	
 	this.generate(h,1);
 }
@@ -397,6 +410,11 @@ game.tree.prototype.cure = function(type) {
 }
 
 game.tree.prototype.draw  = function() {
+
+	if(!this.alive) {
+		game.context.drawImage(this.canvasDead, 0, 0);
+		return;
+	}
 
 
 	if(this.lifeForce > 0) {
@@ -422,9 +440,8 @@ game.tree.prototype.draw  = function() {
 
 	
 
-	if(this.currentGeneration < 0) {
-		this.currentGeneration = 0;
-		this.lifeForce = this.canvases.length*100;
+	if(this.currentGeneration < 1) {
+		this.alive = false;
 	}
 
 	for(var i = 0; i < this.currentGeneration; i++) {
@@ -435,7 +452,7 @@ game.tree.prototype.draw  = function() {
 	game.context.drawImage(this.canvases[this.currentGeneration], 0, 0);
 	game.context.globalAlpha = 1;
 
-	if(Math.random() < 0.001) {
+	if(Math.random() < game.statusProbability) {
 		this.statuses.push(new game.treeStatus(this.x))
 	}
 
@@ -446,7 +463,10 @@ game.tree.prototype.draw  = function() {
 	this.lifeForce -= this.statuses.length;
 
 	if(this.statuses.length === 0) {
-		this.lifeForce++;
+		if(this.lifeForce < 1000) {
+			this.lifeForce++;	
+		}
+		
 	}
 
 	this.currentGenerationLifeDelta = 0;
@@ -495,7 +515,6 @@ game.tree.prototype.generate = function(h, generation) {
 	canvas.height = game.height;
 	var ctx = canvas.getContext("2d");
 
-	//reducing line_width and length
 	this.length = this.length * this.reduction;
 	this.lineWidth = this.lineWidth * this.reduction;
 	ctx.lineWidth = this.lineWidth;
@@ -506,18 +525,15 @@ game.tree.prototype.generate = function(h, generation) {
 	for(var i = 0; i < this.start_points.length; i++)
 	{
 		var sp = this.start_points[i];
-		//2 branches will come out of every start point. Hence there will be
-		//2 end points. There is a difference in the divergence.
+
 		var ep1 = get_endpoint(sp.x, sp.y, sp.angle+this.divergence + Math.random()*this.divergence/4, this.length);
 		var ep2 = get_endpoint(sp.x, sp.y, sp.angle-this.divergence - Math.random()*this.divergence/4, this.length);
 		
-		//drawing the branches now
 		ctx.moveTo(sp.x, h-sp.y);
 		ctx.lineTo(ep1.x, h-ep1.y);
 		ctx.moveTo(sp.x, h-sp.y);
 		ctx.lineTo(ep2.x, h-ep2.y);
 		
-		//Time to make this function recursive to draw more branches
 		ep1.angle = sp.angle+this.divergence + Math.random()*this.divergence/4;
 		ep2.angle = sp.angle-this.divergence - Math.random()*this.divergence/4;
 		
@@ -526,15 +542,10 @@ game.tree.prototype.generate = function(h, generation) {
 
 
 	}
-	//Lets add some more color
 	if(this.length < 15) ctx.strokeStyle = "#A1E08F";
 	else ctx.strokeStyle = "#925c00";
 	ctx.stroke();
 	this.start_points = new_start_points;
-	//recursive call - only if length is more than 2.
-	//Else it will fall in an long loop
-
-
 
 	// add leafs
 	var colors = ["rgba(105,145,93,", "rgba(161,224,143,", "rgba(160,219,142,", "rgba(161,224,143,", "rgba(105,145,93,", "rgba(161,224,143,", "rgba(160,219,142,", "rgba(161,224,143,", "rgba(105,145,93,", "rgba(161,224,143,", "rgba(160,219,142,", "rgba(161,224,143,", "rgba(249,255,91,", "rgba(255,154,96,", "rgba(255,89,105,"]
@@ -554,8 +565,6 @@ game.tree.prototype.generate = function(h, generation) {
 	}
 
 	this.canvases.push(canvas);
-
-	
 
 	if(this.length > 2) {
 		this.generate(h, (generation+1))
