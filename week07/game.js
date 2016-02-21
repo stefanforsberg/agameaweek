@@ -28,6 +28,11 @@ game.draw = function() {
 
 
 game.load = function() {
+
+	game.context.font = "30px Arial";
+	game.context.textAlign="center"; 
+	game.context.fillText("Loading...",game.width/2,100);
+
 	game.sounds = [];
 	game.sounds[0] = new Howl({
 		urls: ['song.mp3'],
@@ -69,9 +74,7 @@ game.init = function() {
 
 	game.trees.push(new game.tree(1350, 650));
 	
-	console.log("before init");
 	game.environment.init();
-	console.log("after init");
 
 	game.tools.init();
 
@@ -180,7 +183,7 @@ game.environment = {
 	init: function() {
 
 		this.tick = 0;
-		this.minutes = 1020;
+		this.minutes = 640;
 		this.day = 0;
 		this.resetNight();
 
@@ -195,7 +198,7 @@ game.environment = {
 
 		for(var t = 0; t < game.trees.length; t++) {
 
-			if(!game.trees[t].alive || game.trees[t].currentGeneration < 8) {
+			if(!game.trees[t].alive || game.trees[t].currentGeneration < 5) {
 				continue;
 			}
 
@@ -210,7 +213,7 @@ game.environment = {
 
 		this.tick++;
 
-		if(this.tick % 2 === 0) {
+		if(this.tick % 3 === 0) {
 			this.minutes++;
 
 			if(this.minutes > 1440) {
@@ -396,7 +399,7 @@ game.tree = function(x, h) {
 }
 
 game.tree.prototype.cure = function(type) {
-	var itemToCure = _.findLastIndex(this.statuses, function(s) {console.log("t: " + s.type); return s.type === type;});
+	var itemToCure = _.findLastIndex(this.statuses, function(s) {return s.type === type;});
 	if(itemToCure > -1) {
 		this.statuses.splice(itemToCure, 1);	
 
@@ -518,7 +521,6 @@ game.tree.prototype.generate = function(h, generation) {
 	this.length = this.length * this.reduction;
 	this.lineWidth = this.lineWidth * this.reduction;
 	ctx.lineWidth = this.lineWidth;
-	console.log(this.lineWidth);
 	
 	var new_start_points = [];
 	ctx.beginPath();
@@ -572,17 +574,12 @@ game.tree.prototype.generate = function(h, generation) {
 	else {
 		this.isReady = true;
 		this.lastHeight = h - _.max(new_start_points, function(sp){ return sp.y; }).y + 45;
-		console.log("nmax: " + (h - _.max(new_start_points, function(sp){ return sp.y; }).y))
-		console.log("ready: " + this.canvases.length);
 	}
 }
 
 
 function get_endpoint(x, y, a, length)
 {
-	//This function will calculate the end points based on simple vectors
-	//http://physics.about.com/od/mathematics/a/VectorMath.htm
-	//You can read about basic vectors from this link
 	var epx = x + length * Math.cos(a*Math.PI/180);
 	var epy = y + length * Math.sin(a*Math.PI/180);
 	return {x: epx, y: epy};
