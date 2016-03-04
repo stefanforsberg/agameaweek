@@ -17,6 +17,9 @@ game.init = function() {
 	game.commandInput = document.getElementById("input");
 	game.lastAction = document.getElementById("lastAction");
 	game.reaction = document.getElementById("reaction");
+	game.qteContainer = document.getElementById("qteContainer");
+
+	game.qteContainer.style.display = "none"; 
 
 	Rx.Observable
 		.fromEvent(document, "click")
@@ -66,9 +69,46 @@ game.scene = {
 		game.reaction.value = "";
 		game.input.value = "";
 		game.input.focus();
+		game.lastAction.innerHTML = "";
 
 		return "--m";
 	}
+}
+
+game.qte =  {
+	element: document.getElementById("qte"),
+	start: function(cb) {
+		game.lastAction.style.display = "none";
+		game.reaction.style.display = "none";
+		game.qteContainer.style.display = "block";
+		var that = this;
+		Rx.Observable
+			.timer(2000, 50)
+			.map(function(i) { return 100-i;})
+			.take(101)
+			.subscribe(function(i) {
+				that.element.style.width = i + "%";
+			}, 
+			function (err) {
+			},
+			function () {
+				console.log("cb")
+				cb();
+			});
+	},
+	end: function() {
+		game.lastAction.style.display = "block";
+		game.reaction.style.display = "block";
+		game.qteContainer.style.display = "none";
+	}
+}
+
+game.end = function(t) {
+	game.lastAction.style.display = "none";
+	game.reaction.style.display = "none";
+	game.qteContainer.style.display = "none";
+
+	game.scene.text.innerHTML = t;
 }
 
 game.command = function(c) {
@@ -121,7 +161,7 @@ game.scene.room00x00 = {
 			return "You cannot go north"
 		} else if(c.match(/go south/gi)) {
 			return game.scene.move(game.x, game.y+1);
-		} else if(c.match(/touch fire/gi)) {
+		} else if(c.match(/touch (bon)?fire/gi)) {
 			return "Ouch, that hurt. The fire is warm. Not sure what you were expecting"
 		}
 	}
@@ -137,8 +177,7 @@ game.scene.room00x01 = {
 		if(c.match(/go west/gi)) {
 			return "You cannot go west"
 		} else if(c.match(/go north/gi)) {
-			game.scene.move(game.x, game.y-1);
-			return "move";
+			return game.scene.move(game.x, game.y-1);
 		} else if(c.match(/go south/gi)) {
 			return "For some reason it does not seem like a good idea to try to swim at this particular part of the river"
 		} else if(c.match(/go east/gi)) {
@@ -153,11 +192,26 @@ game.scene.room01x01 = {
 	qte: true,
 	look: function() {
 		if(this.qte) {
+			game.qte.start(function() {game.command("2")});
 			return "Oh no! You can see a girl about to drown in the river. Do you want to try and rescue here? Decide quickly!<br /><br />1 = Rescue, 2 = Don't rescue"	
 		}
+
+		return "You are standing near the river where you decided not to rescue the girl who turned out to be a mermaid"
 		
 	},
 	command: function(c) {
+
+
+		if(this.qte) {
+			this.endQte();
+			if(c.match(/1/gi)) {
+				game.end("You jump into the river to rescue the girl. As you get close her ability to swim seem to improve drastically and before you get a chance to react she drags you to down to a waterfilled grave. Never, ever, never trust a mermaid.")
+				return; 
+			} else if(c.match(/2/gi)) {
+				return "When the girl As she dives down into the water you see a mermaid tail."
+			}			
+		}
+
 		if(c.match(/go west/gi)) {
 			return "You cannot go west"
 		} else if(c.match(/go north/gi)) {
@@ -167,6 +221,11 @@ game.scene.room01x01 = {
 		} else if(c.match(/go east/gi)) {
 			return game.scene.move(game.x+1, game.y);
 		}
+	},
+	endQte: function() {
+		game.qte.end();
+		this.qte = false;
+		game.scene.look();
 	}
 }
 
