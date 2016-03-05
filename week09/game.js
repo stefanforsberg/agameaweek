@@ -208,7 +208,7 @@ game.scene.room01x01 = {
 				game.end("You jump into the river to rescue the girl. As you get close her ability to swim seem to improve drastically and before you get a chance to react she drags you to down to a waterfilled grave. Never, ever, never trust a mermaid.")
 				return; 
 			} else if(c.match(/2/gi)) {
-				return "When the girl As she dives down into the water you see a mermaid tail."
+				return "When the girl realise that you will not try to save her her ability to swim seem to improve drastically and as she dives back into the river you can see a mermaids tail."
 			}			
 		}
 
@@ -217,7 +217,7 @@ game.scene.room01x01 = {
 		} else if(c.match(/go north/gi)) {
 			return game.scene.move(game.x, game.y-1);
 		} else if(c.match(/go south/gi)) {
-			return "For some reason it does not seem like a good idea to try to swim at this particular part of the river"
+			return "Remember the mermaid?"
 		} else if(c.match(/go east/gi)) {
 			return game.scene.move(game.x+1, game.y);
 		}
