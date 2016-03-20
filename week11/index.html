@@ -2,27 +2,65 @@
 <html>
 <head>
 <meta charset="UTF-8">
-	<title>The river</title>
+	<title>vs boss</title>
 	<style type="text/css">
 		body {
 			font-family: 'Inconsolata', sans-serif;
 			color: #ffffff;
 			background-color: #131313;
-			font-size: 2.4vw;
 		}
 
 		.container {
 			width: 800px;
 		}
 
+		#bossDisplay {
+			background-image: url(bossdisplay.png);
+			height: 40px;
+		}
+
+		#bossHealthContainer {
+			position: relative;
+			width: 736px;
+			left: 5px;
+    		top: 5px;
+		}
+
 		#bossHealth {
 			background-color: #FF0000;
-			height: 20px;
+			height: 29px;
 			width: 100%;
 		}
 
+		#bossLevel {
+			position: relative;
+		    font-size: 24px;
+		    left: 748px;
+		    top: -23px;
+		    width: 45px;
+		    text-align: center;
+		}
+
+		#playerDisplay {
+			background-image: url(playerdisplay.png);
+			height: 40px;
+		}
+
+		#playerHealthContainer {
+			position: relative;
+			width: 724px;
+			left: 70px;
+    		top: 5px;
+		}
+
+		#playerHealth {
+			background-color: #FF0000;
+			height: 29px;
+			width: 100%;
+		}		
+
 		#game {
-			background-image: url(bg.png)
+			background-image: url(title.svg)
 		}
 				
 	</style>
@@ -40,9 +78,30 @@
 	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>
 	<!-- End Google Tag Manager -->
 	<div class="container">
-		<div id="bossHealth"></div>
+		<div id="bossDisplay">
+			<div id="bossHealthContainer">
+				<div id="bossHealth"></div>
+			</div>
+			<div id="bossLevel">0</div>
+		</div>
+
 		<canvas id="game" width="800" height="576"></canvas>
+
+		<div id="playerDisplay">
+			<div id="playerHealthContainer">
+				<div id="playerHealth"></div>
+			</div>
+		</div>
 	</div>
+
+	<div class="info">
+		<p>Move with arrow keys</p>
+		<p>1 for fireball at current target. Only 3 fireballs can be active at the same time</p>
+		<p>Tab to switch target</p>
+	</div>
+
+	<img src="boss.svg" id="boss" style="display: none">
+	<img src="player.svg" id="player" style="display: none">
 
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
