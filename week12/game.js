@@ -7,10 +7,31 @@ game.height = 576;
 game.cardFlipped = new Rx.Subject();
 
 game.load = function() {
-	game.init();
+
+	game.sounds = [];
+	game.sounds[0] = new Howl({
+		urls: ['sound.mp3'],
+		sprite: {
+	    	kanonbra: [0, 1050],
+		    highfive: [1400, 1000],
+		    grymt: [2900, 1000],
+		    hurra: [4400, 600],
+		    snyggtjobbat: [5700, 1300],
+		    yeah: [7500, 800],
+	  	},
+		onload: function() {
+			game.init();
+		}		  			
+	});
+
+	game.soundNames = ["kanonbra", "hightfive", "grymt", "hurra", "snyggtjobbat", "yeah"];
+	
 }
 
 game.init = function() {
+
+
+
 	game.resize();
 	game.state.init();
 	game.cards.init();
@@ -34,6 +55,8 @@ game.init = function() {
 
 	game.draw();
 }
+
+
 
 game.draw = function() {
 	game.context.clearRect(0, 0, game.width, game.height);
@@ -68,6 +91,8 @@ game.state = {
 			} else {
 				this.flippedCards[1].found = true;
 				this.flippedCards[0].found = true;
+				game.sounds[0].play(_.sample(game.soundNames));
+
 				this.flippedCards = [];
 			}
 		}
@@ -193,12 +218,20 @@ game.card.prototype.draw = function() {
 
 	game.context.translate(this.x+this.width/2,this.y+this.height/2);
 
+	game.context.scale(this.scale,1);
+
 	if(this.flipping) {
-		game.context.scale(this.scale,1);
+		
 		this.scale+= 0.05*this.scaleDir;
 
 		if(Math.abs(this.scale) >= 1) {
 			
+			// if(this.scale < 0) {
+			// 	this.scale = -0.99;
+			// } else {
+			// 	this.scale = 1;
+			// }
+
 			this.flipping = false;
 
 			game.cardFlipped.onNext(this);
@@ -220,8 +253,7 @@ game.card.prototype.draw = function() {
 		game.context.fillRect(-this.width/2, -this.height/2, this.width, this.height)
 	} else {
 		game.context.drawImage(this.back, -this.width/2, -this.height/2, this.width, this.height);
-		//game.context.fillStyle = this.backColor;
-		//game.context.fillRect(-this.width/2, -this.height/2, this.width, this.height)
+
 	}
 
 	game.context.restore();
