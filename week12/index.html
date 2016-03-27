@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>For J</title>
+	<style type="text/css">
+		body {
+			font-family: 'Inconsolata', sans-serif;
+			color: #ffffff;
+			background-color: #131313;
+		}
+
+		#game {
+		    position: absolute;
+		    top:0;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    margin:auto;
+		}
+				
+	</style>
+
+</head>
+
+<body>
+	<!-- Google Tag Manager -->
+	<!--<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
+	<!-- End Google Tag Manager -->
+	
+	<canvas id="game"></canvas>
+
+	<img src="i01.jpg" id="i01" style="display: none;" />
+	<img src="i02.jpg" id="i02" style="display: none;" />
+	<img src="i03.jpg" id="i03" style="display: none;" />
+	<img src="i04.jpg" id="i04" style="display: none;" />
+	<img src="i05.jpg" id="i05" style="display: none;" />
+	<img src="i06.jpg" id="i06" style="display: none;" />
+	<img src="i07.jpg" id="i07" style="display: none;" />
+	<img src="i08.jpg" id="i08" style="display: none;" />
+	<img src="i09.jpg" id="i09" style="display: none;" />
+	<img src="i10.jpg" id="i10" style="display: none;" />
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	
+	<script type="text/javascript" src="game.js"></script>
+
+	<script>
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(game.load());
+
+
+	</script>
+
+</body>
+
+</html>
+
