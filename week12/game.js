@@ -5,6 +5,7 @@ game.context = game.canvas.getContext("2d");
 game.width = 800;
 game.height = 576;
 game.cardFlipped = new Rx.Subject();
+game.subscriptions = [];
 
 game.load = function() {
 
@@ -24,34 +25,54 @@ game.load = function() {
 		}		  			
 	});
 
-	game.soundNames = ["kanonbra", "hightfive", "grymt", "hurra", "snyggtjobbat", "yeah"];
+	game.soundNames = ["kanonbra", "highfive", "grymt", "hurra", "snyggtjobbat", "yeah"];
 	
 }
 
 game.init = function() {
 
+	game.subscriptions.forEach(function (s) {
+		s.dispose();
+	})
 
+	game.subscriptions = [];
 
 	game.resize();
 	game.state.init();
 	game.cards.init();
 
-	var source = Rx.Observable.fromEvent(game.canvas, 'click')
+	var touchStream = Rx.Observable.fromEvent(game.canvas, 'touchstart')
+		.map(function (e) {
+			e.preventDefault();
+		    var touch = e.touches[0];
+
+		    var boundingRect = game.canvas.getBoundingClientRect()
+
+			return {
+				x: (touch.pageX - boundingRect.left),
+				y:  (touch.pageY - boundingRect.top)
+			}
+		});
+		
+
+	var keyStream = Rx.Observable.fromEvent(game.canvas, 'click')
 		.map(function(e) {
 			return {
 				x: e.pageX - game.canvas.offsetLeft,
 				y: e.pageY - game.canvas.offsetTop
 			}
 		})
-		.subscribe(function(e) {
+		
+
+	game.subscriptions.push(Rx.Observable.merge(touchStream, keyStream).subscribe(function(e) {
 			if(game.state.canFlip()) {
 				game.cards.hit(e);	
 			}
-		});
+		}));
 
-	game.cardFlipped.subscribe(function (cf) {
+	game.subscriptions.push(game.cardFlipped.subscribe(function (cf) {
 		game.state.handleFlippedCard(cf);
-	});
+	}));
 
 	game.draw();
 }
@@ -91,7 +112,9 @@ game.state = {
 			} else {
 				this.flippedCards[1].found = true;
 				this.flippedCards[0].found = true;
-				game.sounds[0].play(_.sample(game.soundNames));
+				var sample = _.sample(game.soundNames);
+				console.log(sample);
+				game.sounds[0].play(sample);
 
 				this.flippedCards = [];
 			}
@@ -132,6 +155,10 @@ game.cards = {
 		cardHeight = Math.floor( (game.canvas.height - ((rows-1)*cardPadding)) / rows );
 		cardWidth = cardHeight;
 
+		this.gradient=game.context.createLinearGradient(0,0,0,cardHeight/2);
+		this.gradient.addColorStop(0,"#E2D9A5");
+		this.gradient.addColorStop(1,"#FDF3B8");
+
 		var widthPaddingLeft = (game.width - Math.floor((cardWidth + cardPadding)*cardsPerRow)) / 2;
 
 		var id = 0;
@@ -169,7 +196,7 @@ game.cards = {
 			backItems.push({back: images[i], id: i});
 		}
 
-		backItems = _.shuffle(backItems);
+		//backItems = _.shuffle(backItems);
 
 		for(var i = 0; i < this.items.length; i++) {
 			this.items[i].setBack(backItems[i].back, backItems[i].id);
@@ -247,10 +274,19 @@ game.card.prototype.draw = function() {
 	}
 
 
-
 	if(this.side === "front") {
-		game.context.fillStyle = "#ffffff";
+		game.context.fillStyle = game.cards.gradient;
 		game.context.fillRect(-this.width/2, -this.height/2, this.width, this.height)
+
+
+
+		game.context.font =  (this.height / 2) + "px Short Stack";
+
+		game.context.fillStyle = "#B39DB5";
+		game.context.textAlign = "center";
+		game.context.textBaseline = 'middle';
+		game.context.fillText("JF", 0, 0, this.width, this.height); 
+
 	} else {
 		game.context.drawImage(this.back, -this.width/2, -this.height/2, this.width, this.height);
 
