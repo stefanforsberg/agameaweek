@@ -6,6 +6,7 @@ game.width = 800;
 game.height = 576;
 game.cardFlipped = new Rx.Subject();
 game.subscriptions = [];
+game.isRunning = true;
 
 game.load = function() {
 
@@ -30,6 +31,8 @@ game.load = function() {
 }
 
 game.init = function() {
+
+
 
 	game.subscriptions.forEach(function (s) {
 		s.dispose();
@@ -74,6 +77,8 @@ game.init = function() {
 		game.state.handleFlippedCard(cf);
 	}));
 
+	game.isRunning = true;
+
 	game.draw();
 }
 
@@ -84,9 +89,11 @@ game.draw = function() {
 
 	game.cards.draw();
 
-	window.requestAnimationFrame(game.draw);
-
-
+	if(game.isRunning) {
+		window.requestAnimationFrame(game.draw);	
+	} else {
+		game.init();
+	}
 }
 
 game.state = {
@@ -95,6 +102,9 @@ game.state = {
 		this.flippedCards = [];
 	},
 	handleFlippedCard: function(card) {
+
+		var that = this;
+
 		if(card.scaleDir < 0) {
 			this.flippedCards.push(card);
 		} else {
@@ -103,7 +113,7 @@ game.state = {
 
 		if(this.flippedCards.length === 2) {
 			if(this.flippedCards[0].cardId !== this.flippedCards[1].cardId) {
-				var that = this;
+				
 				setTimeout(function() {
 					that.flippedCards[1].flip();
 					that.flippedCards[0].flip();
@@ -113,10 +123,15 @@ game.state = {
 				this.flippedCards[1].found = true;
 				this.flippedCards[0].found = true;
 				var sample = _.sample(game.soundNames);
-				console.log(sample);
 				game.sounds[0].play(sample);
 
 				this.flippedCards = [];
+
+				if(_.where(game.cards.items, {found: false}).length === 0) {
+					setTimeout(function() {
+						game.isRunning = false;
+					}, 2000)
+				}
 			}
 		}
 	},
@@ -196,7 +211,7 @@ game.cards = {
 			backItems.push({back: images[i], id: i});
 		}
 
-		//backItems = _.shuffle(backItems);
+		backItems = _.shuffle(backItems);
 
 		for(var i = 0; i < this.items.length; i++) {
 			this.items[i].setBack(backItems[i].back, backItems[i].id);
