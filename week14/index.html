@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>For J</title>
+	<style type="text/css">
+		body {
+			color: #ffffff;
+		}
+
+		#game {
+/*		    position: absolute;
+		    top:0;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    margin:auto;*/
+		}
+				
+	</style>
+
+</head>
+
+<body>
+
+	<!-- Google Tag Manager -->
+	<!--<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
+	<!-- End Google Tag Manager -->
+	
+	<canvas id="game" width="800" height="960"></canvas><br>
+	<a href="#" id="wood">Wood</a>
+	<a href="#" id="soil">Soil</a>
+	<a href="#" id="sow">Sow</a>
+	<a href="#" id="stone">Stone</a>
+
+	<img src="map.png" id="mapImage" hidden />
+	<img src="chars_map.png" id="chars_map" hidden />
+	<img src="char_hunter.png" id="char_hunter" hidden />
+	<img src="tileset.png" id="tileset" hidden />
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script type="text/javascript" src="pathfinding-browser.min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="game.map.js"></script>
+	<script type="text/javascript" src="game.player.js"></script>
+	<script type="text/javascript" src="game.tree.js"></script>
+	<script type="text/javascript" src="game.target.js"></script>
+	<script type="text/javascript" src="game.tasks.js"></script>
+	<script type="text/javascript" src="game.build.js"></script>
+	<script type="text/javascript" src="game.scroll.js"></script>
+
+	<script>
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+
+		ready(game.load());
+
+
+	</script>
+
+</body>
+
+</html>
+
+
