@@ -2,20 +2,50 @@
 <html>
 <head>
 <meta charset="UTF-8">
-	<title>For J</title>
+	<title>Life is pointless</title>
 	<style type="text/css">
 		body {
 			color: #ffffff;
 		}
 
-		#game {
-/*		    position: absolute;
-		    top:0;
-		    bottom: 0;
-		    left: 0;
-		    right: 0;
-		    margin:auto;*/
+		#game-container {
+			width: 100%;
+			text-align: center;
 		}
+
+		#game {
+			display: inline;
+		}
+
+		.menu-container {
+			width: 832px;
+			margin: auto;
+			background-color: #787878;
+		    margin-top: -4px;
+		    padding: 5px 5px 2px 5px;
+    		box-sizing: border-box;
+		}
+
+		.menu-container a img {
+			border: solid 5px #343434;
+		}
+
+		.player {
+			float: left;
+		}
+
+		.build {
+			float: right;
+		}
+
+		#task {
+			display: inline-block;
+    		line-height: 40px;
+    		font-family: Arial
+		}
+
+
+
 				
 	</style>
 
@@ -33,11 +63,30 @@
 	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
 	<!-- End Google Tag Manager -->
 	
-	<canvas id="game" width="800" height="960"></canvas><br>
-	<a href="#" id="wood">Wood</a>
-	<a href="#" id="soil">Soil</a>
-	<a href="#" id="sow">Sow</a>
-	<a href="#" id="stone">Stone</a>
+	<div id="game-container">
+		<canvas id="game" width="800" height="960"></canvas>
+		<div class="menu-container">
+			<div class="player">
+				<a href="#"><img src="chars_map.png" id="wizard" /></a>
+				<a href="#"><img src="char_hunter.png" id="hunter" /></a>
+			</div>
+
+			
+
+			<div class="build">
+				<a href="#" id="wood"><img style="width: 32px; height: 32px; background: url(tileset.png) 0 -64px"></a>
+				<a href="#" id="soil"><img style="width: 32px; height: 32px; background: url(tileset.png) 0 -96px"></a>
+				<a href="#" id="sow"><img style="width: 32px; height: 32px; background: url(tileset.png) -256px -96px"></a></a>
+				<a href="#" id="stone"><img style="width: 32px; height: 32px; background: url(tileset.png) -160px -64px"></a>
+			</div>
+
+			<div style="clear: both;"></div>
+			
+			<div id="task">Loading...</div>
+		
+		</div>
+
+	</div>
 
 	<img src="map.png" id="mapImage" hidden />
 	<img src="chars_map.png" id="chars_map" hidden />
@@ -57,6 +106,7 @@
 	<script type="text/javascript" src="game.tasks.js"></script>
 	<script type="text/javascript" src="game.build.js"></script>
 	<script type="text/javascript" src="game.scroll.js"></script>
+	<script type="text/javascript" src="game.pyramid.js"></script>
 
 	<script>
 		var game = game || {};

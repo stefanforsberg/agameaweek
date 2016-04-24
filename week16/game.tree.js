@@ -2,8 +2,6 @@ game.trees = {
 	items: [],
 	init: function(map) {
 
-		console.log(map);
-
 		this.items = [];
 
 		map.objects.forEach(function (o) {
@@ -28,24 +26,21 @@ game.tree = function(id, x, y) {
 	this.life = 100;
 	this.x = x;
 	this.y = y;
+	this.img = game.tiles.tree1;
 	return this;
 }
 
 game.tree.prototype.draw = function() {
-	var tileCoord = {
-		x: 64,
-		y: 0
-	};
-
+	
 	if(this.life <= 75 && this.life > 50) {
-		tileCoord.x = 96;
+		this.img = game.tiles.tree2;
 	} else if(this.life <= 50 && this.life > 25) {
-		tileCoord.x = 128;
+		this.img = game.tiles.tree3;
 	} else if(this.life <= 25 && this.life > 0) {
-		tileCoord.x = 160;
+		this.img = game.tiles.tree4;
 	} else if(this.life == 0) {
-		tileCoord.x = 192;
+		this.img = game.tiles.tree5;
 	}
 
-	game.context.drawImage(game.tileset, tileCoord.x, tileCoord.y, game.tileSize, game.tileSize, this.x*game.tileSize, this.y*game.tileSize, game.tileSize, game.tileSize);
+	game.context.drawImage(this.img, this.x*game.tileSize, this.y*game.tileSize);
 };

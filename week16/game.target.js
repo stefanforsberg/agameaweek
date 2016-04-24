@@ -21,11 +21,6 @@ game.target = {
 
 		game.subscriptions.push(Rx.Observable.fromEvent(game.canvas, 'click').scan(function (target, e) {
 
-			
-			if(game.player.clicked(target.x, target.y)) {
-				target.current = game.player.current;
-			}
-
 			if(!target.current) {
 				return target;
 			}
@@ -52,9 +47,7 @@ game.target = {
 			}
 
 			var grid = game.pathFinderGrid.clone();
-			console.log(game.player.x + ", " + game.player.y + "; " + target.x + ", " + target.y)
 			var path = target.finder.findPath(game.player.current.x, game.player.current.y, target.x, target.y, grid);
-			console.log(path)
 			game.player.setMovementArray(path);
 
 			return target;

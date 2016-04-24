@@ -4,6 +4,20 @@ game.player = {
 	taskColor: "",
 	init: function() {
 		this.current = game.wizard;
+
+		document.getElementById("wizard").onclick = (function () {
+			this.movement = [];
+			this.current = game.wizard;
+			game.target.current = game.player.current
+			game.tasks.setTaskText("Controlling wizard");
+		}).bind(this);
+
+		document.getElementById("hunter").onclick = (function () {
+			this.movement = [];
+			this.current = game.hunter;
+			game.target.current = game.player.current
+			game.tasks.setTaskText("Controlling hunter");
+		}).bind(this);		
 	},
 	draw: function(t) {
 	
@@ -20,7 +34,6 @@ game.player = {
 			game.context.strokeRect(this.current.x.tileToPos(), this.current.y.tileToPos(), game.tileSize, game.tileSize);
 			game.context.restore();	
 		}
-		
 
 		game.context.drawImage(game.wizard.img, game.wizard.x.tileToPos(), game.wizard.y.tileToPos());
 		game.context.drawImage(game.hunter.img, game.hunter.x.tileToPos(), game.hunter.y.tileToPos());
@@ -31,19 +44,6 @@ game.player = {
 	},
 	isInRangeOf: function(x,y) {
 		return this.current.isInRangeOf(x,y);
-	},
-	clicked: function(x, y) {
-		if(x === game.wizard.x && y === game.wizard.y) {
-			this.movement = [];
-			this.current = game.wizard;
-			return true;
-		} else if(x === game.hunter.x && y === game.hunter.y) {
-			this.movement = [];
-			this.current = game.hunter;
-			return true;
-		}
-
-		return false;
 	}
 }
 

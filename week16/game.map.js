@@ -41,10 +41,26 @@ game.map = {
 			this.tileArray[o.y.toTileY()][o.x.toTileX()+1] = "water";
 			game.pathFinderGrid.setWalkableAt(o.x.toTileX()+1, o.y.toTileY(), false);
 		}, this);
+
+		var mountainLayer = map.layers[3];
+
+		mountainLayer.objects.forEach(function (o) {
+			this.tileArray[o.y.toTileY()][o.x.toTileX()+1] = "mountain";
+			game.pathFinderGrid.setWalkableAt(o.x.toTileX()+1, o.y.toTileY(), false);
+		}, this);
+
+		var pyramidLayer = map.layers[4];
+
+		game.pyramids.init(pyramidLayer);
+
+		pyramidLayer.objects.forEach(function (o) {
+			this.tileArray[o.y.toTileY()][o.x.toTileX()+1] = "pyramid";
+			game.pathFinderGrid.setWalkableAt(o.x.toTileX()+1, o.y.toTileY(), false);
+		}, this);
 	},
 	tileTypeAt: function(x, y) {
 
-		if( (y < 0 || y > this.tileArray.length) || (x < 0 || x > this.tileArray[0].length) ) {
+		if( (y < 0 || y >= this.tileArray.length) || (x < 0 || x > this.tileArray[0].length) ) {
 			return "oob";
 		}
 
@@ -69,12 +85,6 @@ game.loadMap = function(cb) {
 }
 
 game.parseMap = function(map) {
-
 	game.map.init(map);
-
-	console.log(map);
-
-
-
 }
 

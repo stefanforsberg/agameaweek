@@ -1,5 +1,6 @@
 game.tasks = {
 	items: [],
+	taskText: document.getElementById("task"),
 	init: function() {
 		this.items = [];
 	},
@@ -13,7 +14,11 @@ game.tasks = {
 		this.items.forEach(function (o) {
 			o.draw(t);
 		});
+	}, 
+	setTaskText: function(t) {
+		this.taskText.innerHTML = t;
 	}
+
 }
 
 game.treeTask = function(p, t) {
@@ -41,9 +46,6 @@ game.treeTask.prototype.draw = function(ts) {
 			this.lineDash = 4
 		}
 	}
-
-
-
 
 	game.context.save();
 	game.context.translate(0.5, 0.5);
