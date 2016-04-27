@@ -99,17 +99,21 @@ game.findMatches = function() {
 			var y3 = _.first(_.where(game.smiles, {x: x, y: (y-2), color: y1.color}));	
 
 			if(y2 && y3) {
-				console.log("matches at " + x + ", " + y);
+				console.log("y matches at " + x + ", " + y);
 				game.removeAndAddY(y1,y2,y3);
 				break mainLoop;
 			}			
 			
+			var x1 = _.first(_.where(game.smiles, {x: x, y: y}));	
+			var x2 = _.first(_.where(game.smiles, {x: (x-1), y: y, color: x1.color}));	
+			var x3 = _.first(_.where(game.smiles, {x: (x-2), y: y, color: x1.color}));	
 
-			
+			if(x2 && x3) {
+				console.log("x matches at " + x + ", " + y);
+				game.removeAndAddX(x1,x2,x3);
+				break mainLoop;
+			}
 
-			_.where(game.smiles, {x: x, y: y});	
-			_.where(game.smiles, {x: (x-1), y: y});	
-			_.where(game.smiles, {x: (x-2), y: y});	
 		}
 	}
 }
@@ -138,9 +142,32 @@ game.removeAndAddY = function(s1,s2,s3) {
 
 		_.each(_.filter(game.smiles, function(s) {return s.x === x && s.y < y}), function(s) { s.dy = s.y + 3 });
 	}, 1000)
+}
 
+game.removeAndAddX = function(s1,s2,s3) {
+	console.log(s1);
 
+	var x = s1.x;
+	var y = s3.y;
 
-		
+	game.context.lineWidth=10;
 
+	game.context.strokeRect(s3.x.toPixel(), s3.y.toPixel(), Number(3).toPixel(),Number(1).toPixel())
+
+	game.animating = true;
+
+	setTimeout(function() {
+
+		game.animating = false;
+
+		game.smiles = _.without(game.smiles, s1,s2,s3);
+
+		game.smiles.push(new game.smile(s1.x, -1));
+		game.smiles.push(new game.smile(s2.x, -1));
+		game.smiles.push(new game.smile(s3.x, -1));
+
+		_.each(_.filter(game.smiles, function(s) {return s.x === s1.x && s.y < y}), function(s) { s.dy = s.y + 1 });
+		_.each(_.filter(game.smiles, function(s) {return s.x === s2.x && s.y < y}), function(s) { s.dy = s.y + 1 });
+		_.each(_.filter(game.smiles, function(s) {return s.x === s3.x && s.y < y}), function(s) { s.dy = s.y + 1 });
+	}, 1000)
 }
