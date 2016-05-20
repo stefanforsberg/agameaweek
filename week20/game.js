@@ -85,6 +85,10 @@ game.draw = function(t) {
 	window.requestAnimationFrame(game.draw);
 }
 
+game.isOnScreen = function(i) {
+	return game.collides(i, {x: game.offsetX, y: 0, width: game.width, height: game.height});
+}
+
 game.collides = function colCheck(shapeA, shapeB) {
     var vX = (shapeA.x + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2));
     var vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2));
@@ -149,11 +153,11 @@ game.player = {
 			}
 
 			if(nx > 0 || ny > 0) {
-				if(game.map.blocked({x: nx, y: this.y, width: game.tileSize, height: game.tileSize})) {
+				if(game.map.blocked({x: nx, y: this.y, width: game.tileSize - 4, height: game.tileSize - 4})) {
 					nx = this.x;
 				}
 
-				if(game.map.blocked({x: this.x, y: ny, width: game.tileSize, height: game.tileSize})) {
+				if(game.map.blocked({x: this.x, y: ny, width: game.tileSize - 4, height: game.tileSize - 4})) {
 					ny = this.y;
 				}
 			}

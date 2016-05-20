@@ -8,22 +8,17 @@ game.walls = {
 		}, this)
 	},
 	canSee: function(o1, o2) {
-		var charsThatSeePlayer = _.filter(this.items, function(w) {
 
-			if(!o1.canTarget()) {
-				return false;
-			}
+		var o1Fixed = {x: o1.x+game.tileSize/2, y: o1.y+game.tileSize/2};
+		var o2Fixed = {x: o2.x+game.tileSize/2, y: o2.y+game.tileSize/2};
 
-			var o1Fixed = {x: o1.x+game.tileSize/2, y: o1.y+game.tileSize/2};
-			var o2Fixed = {x: o2.x+game.tileSize/2, y: o2.y+game.tileSize/2};
-
-			var canSee = !isIntersect(o1Fixed, o2Fixed, {x: w.x1, y: w.y1}, {x: w.x2, y: w.y2})
-
-			if(canSee) {
-				o1.target(o1Fixed.x, o1Fixed.y, o2Fixed.x, o2Fixed.y);	
-			}
-			
+		var wallsBetweenObjects = _.some(this.items, function(w) {
+			return isIntersect(o1Fixed, o2Fixed, {x: w.x1, y: w.y1}, {x: w.x2, y: w.y2})
 		});
+
+		if(!wallsBetweenObjects) {
+			o1.target(o1Fixed.x, o1Fixed.y, o2Fixed.x, o2Fixed.y)
+		}
 	}
 }
 

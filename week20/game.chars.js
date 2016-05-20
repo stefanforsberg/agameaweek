@@ -25,31 +25,38 @@ game.charSm = function(c) {
 	this.img = document.getElementById("charsm");
 	this.x = c.x;
 	this.y = c.y;
+	this.width = game.tileSize;
+	this.height = game.tileSize;
 	this.sprite = 0;
 	this.spriteCounter = 0;
 	this.rotation = c.rotation;
 	this.ticketDelay = 0;
+	this.id = c.id;
 	for(var k in c.properties) this[k]=Number(c.properties[k]);
+
+	console.log(this);
 
 	return this;
 }
 
 game.charSm.prototype.canTarget = function() {
 
-	if(this.dx > 0) {
-		if(this.dir > 0) {
-			return game.player.x > this.x;
-		} else {
-			return game.player.x < this.x;
-		}
-	} else if(this.dy > 0) {
-		if(this.dir > 0) {
-			return game.player.y > this.y;
-		} else {
-			return game.player.y < this.y
+	if(game.isOnScreen(this)) 
+	{
+		if(this.dx > 0) {
+			if(this.dir > 0) {
+				return game.player.x > this.x;
+			} else {
+				return game.player.x < this.x;
+			}
+		} else if(this.dy > 0) {
+			if(this.dir > 0) {
+				return game.player.y > this.y;
+			} else {
+				return game.player.y < this.y
+			}
 		}
 	}
-	
 
 	return false;
 }
@@ -59,6 +66,7 @@ game.charSm.prototype.target = function(sx, sy, dx, dy) {
 	if(this.ticketDelay > 0) {
 		this.ticketDelay--;
 	} else {
+		console.log("delay ended: " + this.id);
 		game.chars.tickets.push(new game.jiraTicket(sx, sy, dx, dy, 2));
 		this.ticketDelay = 100;
 	}
@@ -89,8 +97,11 @@ game.jiraTicket.prototype.draw = function() {
 
 game.charSm.prototype.draw = function() {
 
-	game.walls.canSee(this, game.player)
-
+	if(this.canTarget()) {
+		
+		game.walls.canSee(this, game.player)	
+	}
+	
 	game.context.save();
 	
 	game.context.translate(this.x + (game.tileSize/2), this.y + (game.tileSize/2));
@@ -144,6 +155,7 @@ function Ccw(p1, p2, p3) {
   d = p2.y;
   e = p3.x; 
   f = p3.y;
+  
   return (f - b) * (c - a) > (d - b) * (e - a);
 }
 
