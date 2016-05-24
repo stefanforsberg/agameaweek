@@ -16,8 +16,12 @@ game.walls = {
 			return isIntersect(o1Fixed, o2Fixed, {x: w.x1, y: w.y1}, {x: w.x2, y: w.y2})
 		});
 
-		if(!wallsBetweenObjects) {
-			o1.target(o1Fixed.x, o1Fixed.y, o2Fixed.x, o2Fixed.y)
+		return {
+			canSee: !wallsBetweenObjects,
+			o1x: o1Fixed.x, 
+			o1y: o1Fixed.y, 
+			o2x: o2Fixed.x, 
+			o2y: o2Fixed.y
 		}
 	}
 }

@@ -86,6 +86,10 @@ game.draw = function(t) {
 }
 
 game.isOnScreen = function(i) {
+	return ((i.x + game.tileSize) >= game.offsetX && i.x < (game.offsetX + game.width - game.tileSize))
+}
+
+game.isOnScreenFull = function(i) {
 	return game.collides(i, {x: game.offsetX, y: 0, width: game.width, height: game.height});
 }
 
@@ -172,10 +176,11 @@ game.player = {
 				y: this.y - game.offsetY,
 			} 
 
-			if(relativeScreenPosition.x > 400 && game.offsetX < (game.map.width-game.width))  {
-				game.offsetX+= Math.abs(vx);
-			} else if(relativeScreenPosition.x < 172 && game.offsetX >= 4) {
-				game.offsetX-=Math.abs(vx);
+			if( (relativeScreenPosition.x > 400 && game.offsetX < (game.map.width-game.width)) 
+				||
+				(relativeScreenPosition.x < 172 && game.offsetX >= 4) 
+				)  {
+				game.offsetX+= Math.round(vx);
 			}
 
 		} else {
