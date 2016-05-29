@@ -1,4 +1,11 @@
 game.chars = {
+	images: {
+		sm: document.getElementById("charsm"),
+		ea: document.getElementById("charea"),
+		alert: document.getElementById("alert"),
+		jira: document.getElementById("jira"),
+		xml: document.getElementById("xml")
+	} ,
 	items: [],
 	tickets: [],
 	init: function(chars) {
@@ -7,8 +14,10 @@ game.chars = {
 
 		chars.forEach(function (c) {
 			if(c.type === "sm") {
-				this.items.push(new game.charSm(c));	
-			} else if(c.type === "follow") {
+				this.items.push(new game.charSm(c, game.chars.images.sm, game.chars.images.jira));	
+			} else if(c.type === "ea") {
+				this.items.push(new game.charSm(c, game.chars.images.ea, game.chars.images.xml));	
+			}else if(c.type === "follow") {
 				this.items.push(new game.charFollow(c));	
 			}
 			
@@ -24,13 +33,7 @@ game.chars = {
 			c.draw();
 		})
 
-
 		this.tickets = _.reject(this.tickets, function(t) { return t.remove; })
-		// if(ticketsOffScreen.length > 0) {
-		// 	console.log("preci: " + this.tickets.length)
-		// 	this.tickets = _.without(this.tickets, ticketsOffScreen);
-		// 	console.log("after: " + this.tickets.length)
-		// }
 	}
 }
 
@@ -42,6 +45,7 @@ game.charFollow = function(c) {
 	this.width = game.tileSize;
 	this.height = game.tileSize;
 	this.rotation = 0;
+	this.text = c.properties.text;
 
 	return this;
 }
@@ -53,16 +57,33 @@ game.charFollow.prototype.draw = function() {
 		var alpha = (this.x - game.player.x) / 200;
 		
 		if(Math.abs(alpha < 1)) {
-			game.context.fillStyle="rgba(255,255,255," + (1-alpha)*0.7 +  ")"
-			game.context.strokeStyle="rgba(0,0,0," + (1-alpha)*0.7 +  ")"
-			game.context.fillRect(455,350, 230, 57);
-			game.context.strokeRect(455,350, 230, 57);
 
-			game.context.fillStyle="rgba(0,0,0," + (1-alpha) + ")"
-			game.context.font="10px 'Press Start 2P'";
-			game.context.fillText("Morning! You need to",460, 370);
-			game.context.fillText("hurry back to day care",460, 370+14*1);
-			game.context.fillText("to pick up your kids!",460,  370+14*2);
+			alpha = 1-Math.abs(alpha);
+
+			if(this.text === "welcome") {
+				game.context.fillStyle="rgba(255,255,255," + alpha*0.7 +  ")"
+				game.context.strokeStyle="rgba(0,0,0," + alpha*0.7 +  ")"
+				game.context.fillRect(455,350, 230, 57);
+				game.context.strokeRect(455,350, 230, 57);
+
+				game.context.fillStyle="rgba(0,0,0," + alpha + ")"
+				game.context.font="10px 'Press Start 2P'";
+				game.context.fillText("Morning! You need to",460, 370);
+				game.context.fillText("hurry back to day care",460, 370+14*1);
+				game.context.fillText("to pick up your kids!",460,  370+14*2);	
+			} else if(this.text === "key") {
+				game.context.fillStyle="rgba(255,255,255," + alpha*0.7 +  ")"
+				game.context.strokeStyle="rgba(0,0,0," + alpha*0.7 +  ")"
+				game.context.fillRect(2176,160, 230, 57);
+				game.context.strokeRect(2176,160, 230, 57);
+
+				game.context.fillStyle="rgba(0,0,0," + alpha + ")"
+				game.context.font="10px 'Press Start 2P'";
+				game.context.fillText("Beware! The enterprice",2181, 180);
+				game.context.fillText("architects are up",2181, 180+14*1);
+				game.context.fillText("ahead!",2181,  180+14*2);	
+			}
+			
 		}
 
 		var deltaX = this.x - game.player.x;
@@ -79,9 +100,10 @@ game.charFollow.prototype.draw = function() {
 
 };
 
-game.charSm = function(c) {
-	this.img = document.getElementById("charsm");
-	this.alertImg = document.getElementById("alert");
+game.charSm = function(c, img, ticketImg) {
+	this.img = img;
+	this.ticketImg = ticketImg;
+	this.alertImg = game.chars.images.alert;
 	this.x = c.x;
 	this.y = c.y;
 	this.width = game.tileSize;
@@ -92,7 +114,7 @@ game.charSm = function(c) {
 	this.ticketDelay = 0;
 	this.id = c.id;
 	for(var k in c.properties) this[k]=Number(c.properties[k]);
-
+	console.log(this.x);
 	return this;
 }
 
@@ -123,14 +145,10 @@ game.charSm.prototype.target = function(sx, sy, dx, dy) {
 	if(this.ticketDelay > 0) {
 		this.ticketDelay--;
 	} else {
-		console.log("delay ended: " + this.id);
-		game.chars.tickets.push(new game.jiraTicket(sx, sy, dx, dy, 2));
-		this.ticketDelay = 100;
+		game.chars.tickets.push(new game.ticket(sx, sy, dx, dy, 2, this.ticketImg));
+		this.ticketDelay = this.ticketDelayMax;
 	}
 }
-
-
-
 
 game.charSm.prototype.draw = function() {
 
@@ -145,59 +163,71 @@ game.charSm.prototype.draw = function() {
 			this.target(canSee.o1x, canSee.o1y, canSee.o2x, canSee.o2y);
 		}
 	}
-	
-	game.context.save();
-	
-	game.context.translate(this.x + (game.tileSize/2), this.y + (game.tileSize/2));
-	game.context.rotate(this.rotation*Math.PI/180);		
-	game.context.drawImage(this.img, 
-		this.sprite*game.tileSize, 0, game.tileSize, game.tileSize,
-		-(game.tileSize/2), -(game.tileSize/2), game.tileSize, game.tileSize
-		);
-	
-	game.context.restore();	
 
+	if(this.notMoving) {
+		game.context.save();
+	
+		game.context.translate(this.x + (game.tileSize/2), this.y + (game.tileSize/2));
+		game.context.rotate(this.rotation*Math.PI/180);		
+		game.context.drawImage(this.img, 
+			this.sprite*game.tileSize, 0, game.tileSize, game.tileSize,
+			-(game.tileSize/2), -(game.tileSize/2), game.tileSize, game.tileSize
+			);
+		
+		game.context.restore();	
+	} else {
+		game.context.save();
+	
+		game.context.translate(this.x + (game.tileSize/2), this.y + (game.tileSize/2));
+		game.context.rotate(this.rotation*Math.PI/180);		
+		game.context.drawImage(this.img, 
+			this.sprite*game.tileSize, 0, game.tileSize, game.tileSize,
+			-(game.tileSize/2), -(game.tileSize/2), game.tileSize, game.tileSize
+			);
+		
+		game.context.restore();	
 
+		this.spriteCounter++;
+
+		if(this.spriteCounter % 15 === 0) {
+			this.sprite++;	
+		}
+
+		if(this.sprite > 3) {
+			this.sprite = 0;
+			this.spriteCounter = 0;
+		}
+
+		this.x += this.dir*this.dx;
+		this.y += this.dir*this.dy;
+
+		if(this.x > this.maxX) {
+			this.dir = this.dir*-1;
+			this.rotation += 180;
+		}
+
+		if(this.x < this.minX) {
+			this.dir = this.dir*-1;	
+			this.rotation += 180;
+		}
+
+		if(this.y > this.maxY) {
+			this.dir = this.dir*-1;
+			this.rotation += 180;
+		}
+
+		if(this.y < this.minY) {
+			this.dir = this.dir*-1;
+			this.rotation += 180;
+		}
+	}
+	
 	if(this.alert) {
 		game.context.drawImage(this.alertImg, this.x, this.y);
 	}
-
-	this.spriteCounter++;
-
-	if(this.spriteCounter % 15 === 0) {
-		this.sprite++;	
-	}
-
-	if(this.sprite > 3) {
-		this.sprite = 0;
-		this.spriteCounter = 0;
-	}
-
-	this.x += this.dir*this.dx;
-	this.y += this.dir*this.dy;
-
-	if(this.x > this.maxX) {
-		this.dir = this.dir*-1;
-		this.rotation += 180;
-	}
-
-	if(this.x < this.minX) {
-		this.dir = this.dir*-1;	
-		this.rotation += 180;
-	}
-
-	if(this.y > this.maxY) {
-		this.dir = this.dir*-1;
-		this.rotation += 180;
-	}
-
-	if(this.y < this.minY) {
-		this.dir = this.dir*-1;
-		this.rotation += 180;
-	}
 };
 
-game.jiraTicket = function(sx, sy, dx, dy, acceleration) {
+game.ticket = function(sx, sy, dx, dy, acceleration, img) {
 
 	var dX = sx - dx;
 	var dY = sy - dy;
@@ -207,7 +237,7 @@ game.jiraTicket = function(sx, sy, dx, dy, acceleration) {
 	this.y = sy;
 	this.width = 32;
 	this.height = 32;
-	this.img = document.getElementById("jira");
+	this.img = img;
 	this.vx = -1*(dX/dist)*acceleration;
 	this.vy = -1*(dY/dist)*acceleration;
 
@@ -216,23 +246,28 @@ game.jiraTicket = function(sx, sy, dx, dy, acceleration) {
 	return this;
 }
 
-game.jiraTicket.prototype.draw = function() {
+game.ticket.prototype.boundingBox = function() {
+	return {
+		x: this.x + 5,
+		y: this.y + 7,
+		width: 20,
+		height: 16
+	}
+}
+
+game.ticket.prototype.draw = function() {
 	game.context.drawImage(this.img, this.x, this.y);
 
 	this.x += this.vx;
 	this.y += this.vy;
 
 	if(game.isOnScreenFull(this)) {
-		if (game.collides(this, game.player)) {
-			console.log("coll player");
+
+		if (game.collides(this.boundingBox(), game.player)) {
 			this.remove = true;
 		}
 	} else {
 		this.remove = true;
-	}
-
-	if(this.remove) {
-		console.log("removing");
 	}
 }
 

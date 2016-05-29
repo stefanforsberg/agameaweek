@@ -14,6 +14,9 @@ game.offsetY = 0;
 game.floor1 = document.getElementById("floor1");
 
 game.load = function() {
+
+	game.context.drawImage(document.getElementById("title"), 0, 0)
+
 	game.loadMap(function (map) {
 		game.map.init(map);
 		game.init();
@@ -80,7 +83,7 @@ game.draw = function(t) {
 
 	game.chars.draw();
 
-	
+	game.stuff.draw();
 
 	window.requestAnimationFrame(game.draw);
 }
@@ -180,7 +183,7 @@ game.player = {
 				||
 				(relativeScreenPosition.x < 172 && game.offsetX >= 4) 
 				)  {
-				game.offsetX+= Math.round(vx);
+				game.offsetX+= vx;
 			}
 
 		} else {

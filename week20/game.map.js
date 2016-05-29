@@ -36,9 +36,18 @@ game.map = {
 
 		game.chars.init(chars.objects);
 
+		var stuff =  _.findWhere(map.layers, {name: "Stuff"});
+
+		game.stuff.init(stuff.objects);
+
 	},
 	blocked: function(p) {
-		return _.some(this.block, function(b) {
+
+		var currentScreenBlocks = _.filter(this.block, function(b) {
+			return game.isOnScreenFull(b);
+		})
+
+		return _.some(currentScreenBlocks, function(b) {
 			return game.collides(b, p);
 		}) 
 	}
