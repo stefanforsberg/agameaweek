@@ -7,20 +7,27 @@ game.colors = ["#ECB200", "#D96D3A", "#D44380", "#ADC800", "#671E46"]
 
 game.tileSize = 32;
 game.width = 650;
-game.height = 650;
+game.height = 480;
 game.subscriptions = [];
 game.offsetX = 0;
 game.offsetY = 0;
 game.floor1 = document.getElementById("floor1");
+game.isRunning = false;
 
 game.load = function() {
 
-	game.context.drawImage(document.getElementById("title"), 0, 0)
+	game.song = new Howl({
+		urls: ['song.mp3'],
+		loop: true,
+		onload: function() {
+			game.loadMap(function (map) {
+				game.map.init(map);
+				game.init();
+			})
+		}		  			
+	});
 
-	game.loadMap(function (map) {
-		game.map.init(map);
-		game.init();
-	})
+
 	
 }
 
@@ -33,6 +40,7 @@ game.keys = {
 game.init = function() {
 
 	game.player.init();
+	game.state.init();
 
 	var keyDownStream = Rx.Observable.fromEvent(document, 'keydown')
 		.map(function (k) {
@@ -53,6 +61,14 @@ game.init = function() {
 	var keyStream = Rx.Observable.merge(keyDownStream, keyUpStream);
 
 	game.subscriptions.push(keyStream.subscribe(function (k) {
+
+		if(k.keyCode === 13 && !game.isRunning) {
+			game.isRunning = true;
+			game.state.start();
+			game.song.play();
+			game.draw()
+		}
+
 		if(k.keyCode === 37) {
 			game.keys.l = k.pressed
 		} else if(k.keyCode === 39) {
@@ -64,10 +80,30 @@ game.init = function() {
 		}
 	}));
 
+	game.context.drawImage(document.getElementById("title"), 0, 0)
+	game.context.font="10px 'Press Start 2P'";
+
+	var x = 80;
+	var y = 308;
+
+	game.context.fillStyle="rgba(255,255,255,0.7)"
+	game.context.strokeStyle="rgba(0,0,0,0.6)"
+	game.context.fillRect(x-20,y-20, 530, 170);
+	game.context.strokeRect(x-20,y-20, 530, 170);
+
+	game.context.fillStyle="rgba(0,0,0,1)"
+	game.context.fillText("You just received a phone call from day care",x, y);
+	game.context.fillText("and you need to head back and pick up your kids.",x, y+14*1);
+	game.context.fillText("On the way you need to find all your stuff",x, y+14*2);
+	game.context.fillText("that for some reason is scattared around the ",x, y+14*3);
+	game.context.fillText("office. You suspect that poor imagination was",x, y+14*4);
+	game.context.fillText("involved. Also, there are five hidden secrets.",x, y+14*5);
+
+	game.context.fillText("You don't have time to deal with jira tickets",x, y+14*7);
+	game.context.fillText("or xml files so avoid them.",x, y+14*8);
+
+	game.context.fillText("Press enter to start.",x, y+14*10);
 	
-
-	game.draw();
-
 }
 
 game.draw = function(t) {
@@ -84,8 +120,30 @@ game.draw = function(t) {
 	game.chars.draw();
 
 	game.stuff.draw();
+	
+	if(game.isRunning) {
+		window.requestAnimationFrame(game.draw);
+	} else {
+		var x = 5850;
+		var y = 100;
 
-	window.requestAnimationFrame(game.draw);
+		game.context.font="14px 'Press Start 2P'";
+
+		game.context.fillStyle="rgba(255,255,255,0.7)"
+		game.context.strokeStyle="rgba(0,0,0,0.6)"
+		game.context.fillRect(x-10,y-30, 450, 170);
+		game.context.strokeRect(x-10,y-30, 450, 170);
+
+		game.context.fillStyle="rgba(0,0,0,1)"
+		game.context.fillText("Good job!",x, y);
+		game.context.fillText("Items fetched: " + game.state.items + " of 4." ,x, y+18*2);
+		game.context.fillText("Secrets found: " + game.state.secrets + " of 5.",x, y+18*3);
+
+		game.context.fillText("Tickets assigned to you: " + game.state.tickets,x, y+18*5);
+
+		game.context.fillText("Total time: " + game.state.totalTime() + " seconds.",x, y+18*7);
+	}
+	
 }
 
 game.isOnScreen = function(i) {
@@ -107,6 +165,30 @@ game.collides = function colCheck(shapeA, shapeB) {
     }
     return false;
 };
+
+game.state = {
+	startTime: null,
+	endTime: null,
+	items: 0,
+	secrets: 0,
+	tickets: 0,
+	init: function() {
+		this.startTime = null;
+		this.endTime = null;
+		this.items = 0;
+		this.secrets = 0;
+		this.tickets = 0;
+	},
+	start: function() {
+		this.startTime = Date.now();
+	},
+	stop: function() {
+		this.endTime = Date.now();	
+	},
+	totalTime: function() {
+		return Math.abs(Math.round((this.startTime - this.endTime) / 1000));
+	},
+}
 
 game.player = {
 	img: document.getElementById("char"),
@@ -179,11 +261,27 @@ game.player = {
 				y: this.y - game.offsetY,
 			} 
 
-			if( (relativeScreenPosition.x > 400 && game.offsetX < (game.map.width-game.width)) 
+			if( (relativeScreenPosition.x > 340 && game.offsetX < (game.map.width-game.width)) 
 				||
-				(relativeScreenPosition.x < 172 && game.offsetX >= 4) 
+				(relativeScreenPosition.x < 300 && game.offsetX >= 4) 
 				)  {
-				game.offsetX+= vx;
+				game.offsetX+= Math.round(vx);
+			}
+
+			if(game.offsetX < 0) {
+				game.offsetX = 0;
+			}
+
+			if(this.x > 6304) {
+
+				game.isRunning = false;
+
+				game.state.stop();
+
+
+
+
+				
 			}
 
 		} else {

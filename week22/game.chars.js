@@ -58,6 +58,8 @@ game.charFollow.prototype.draw = function() {
 		
 		if(Math.abs(alpha < 1)) {
 
+			game.context.font="10px 'Press Start 2P'";
+
 			alpha = 1-Math.abs(alpha);
 
 			if(this.text === "welcome") {
@@ -67,7 +69,6 @@ game.charFollow.prototype.draw = function() {
 				game.context.strokeRect(455,350, 230, 57);
 
 				game.context.fillStyle="rgba(0,0,0," + alpha + ")"
-				game.context.font="10px 'Press Start 2P'";
 				game.context.fillText("Morning! You need to",460, 370);
 				game.context.fillText("hurry back to day care",460, 370+14*1);
 				game.context.fillText("to pick up your kids!",460,  370+14*2);	
@@ -78,8 +79,7 @@ game.charFollow.prototype.draw = function() {
 				game.context.strokeRect(2176,160, 230, 57);
 
 				game.context.fillStyle="rgba(0,0,0," + alpha + ")"
-				game.context.font="10px 'Press Start 2P'";
-				game.context.fillText("Beware! The enterprice",2181, 180);
+				game.context.fillText("Beware! The enterprise",2181, 180);
 				game.context.fillText("architects are up",2181, 180+14*1);
 				game.context.fillText("ahead!",2181,  180+14*2);	
 			}
@@ -114,7 +114,6 @@ game.charSm = function(c, img, ticketImg) {
 	this.ticketDelay = 0;
 	this.id = c.id;
 	for(var k in c.properties) this[k]=Number(c.properties[k]);
-	console.log(this.x);
 	return this;
 }
 
@@ -162,6 +161,11 @@ game.charSm.prototype.draw = function() {
 			this.alert = true;
 			this.target(canSee.o1x, canSee.o1y, canSee.o2x, canSee.o2y);
 		}
+	} else {
+		if(this.ticketDelay < this.ticketDelayMax) {
+			this.ticketDelay+= 0.5; 	
+		}
+		
 	}
 
 	if(this.notMoving) {
@@ -224,6 +228,17 @@ game.charSm.prototype.draw = function() {
 	
 	if(this.alert) {
 		game.context.drawImage(this.alertImg, this.x, this.y);
+
+		var ticketSize = Math.PI*2 *(this.ticketDelay / this.ticketDelayMax);
+
+		game.context.beginPath();
+		game.context.arc(this.x+(game.tileSize/2),this.y+(game.tileSize/2),(game.tileSize/2),0,ticketSize);
+		game.context.strokeStyle ="rgba(172,50,50,0.7)";
+		game.context.lineWidth = 3;
+		game.context.stroke();
+		game.context.lineWidth = 1;
+
+
 	}
 };
 
@@ -264,6 +279,7 @@ game.ticket.prototype.draw = function() {
 	if(game.isOnScreenFull(this)) {
 
 		if (game.collides(this.boundingBox(), game.player)) {
+			game.state.tickets++;
 			this.remove = true;
 		}
 	} else {

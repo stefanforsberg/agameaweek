@@ -6,6 +6,7 @@
 	<style type="text/css">
 		body {
 			color: #ffffff;
+			font-family: 'Press Start 2P'
 		}
 
 		#game-container {
@@ -54,24 +55,24 @@
 <body>
 
 	<!-- Google Tag Manager -->
-	<!-- <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
 	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-5QPCLS');</script> -->
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>
 	<!-- End Google Tag Manager -->
 	
 	<div id="game-container">
 		<canvas id="game" width="650" height="480"></canvas>
 
-
-
 		<div class="menu-container">
 			<div class="menu">
+				<img src="stuff_notebook_g.png" id="notebook_icon" />
 				<img src="stuff_phone_g.png" id="phone_icon" />
 				<img src="stuff_computer_g.png" id="computer_icon" />
+				<img src="stuff_briefcase_g.png" id="briefcase_icon" />
 
 				<img src="stuff_secret_g.png" id="secret1_icon" />
 				<img src="stuff_secret_g.png" id="secret2_icon" />
@@ -91,12 +92,15 @@
 	<img id="jira" src="jira.png" hidden>
 	<img id="xml" src="xml.png" hidden>
 	<img id="alert" src="alert.png" hidden>
+	<img id="stuff_notebook" src="stuff_notebook.png" hidden>
 	<img id="stuff_phone" src="stuff_phone.png" hidden>
 	<img id="stuff_computer" src="stuff_computer.png" hidden>
+	<img id="stuff_briefcase" src="stuff_briefcase.png" hidden>
 
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
 	<script type="text/javascript" src="game.js"></script>
 	<script type="text/javascript" src="game.map.js"></script>
 	<script type="text/javascript" src="game.chars.js"></script>
@@ -104,6 +108,8 @@
 	<script type="text/javascript" src="game.stuff.js"></script>
 
 	<script>
+
+
 		var game = game || {};
 
 		function ready(fn) {
@@ -114,7 +120,20 @@
 		  }
 		}
 
-		ready(game.load());
+		function loadFonts() {
+			WebFont.load({
+				google: {
+				  families: ['Press Start 2P']
+				}, 
+				active: function() {
+					game.load();
+				},
+			});
+		}
+
+		
+
+		ready(loadFonts());
 
 
 	</script>
