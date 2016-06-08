@@ -1,0 +1,107 @@
+<!--
+http://www.williammalone.com/articles/html5-canvas-example/
+http://gamedevelopment.tutsplus.com/tutorials/cave-levels-cellular-automata--gamedev-9664
+http://www.roguebasin.com/index.php?title=Mysterious_Space
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Tickets</title>
+	<style type="text/css">
+		body {
+			color: #ffffff;
+			font-family: 'Press Start 2P'
+		}
+
+		#game-container {
+			width: 100%;
+			text-align: center;
+		}
+
+		#game {
+			display: inline;
+		}
+
+		.player {
+			float: left;
+		}
+
+		.build {
+			float: right;
+		}
+
+		#task {
+			display: inline-block;
+    		line-height: 40px;
+    		font-family: Arial
+		}
+
+		.menu-container {
+			width: 650px;
+			margin: auto;
+		    margin-top: 10px;
+		    padding: 5px 5px 2px 5px;
+    		box-sizing: border-box;
+		}
+
+		.menu {
+			text-align: center;
+		}
+			
+	</style>
+
+	<link href='https://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+
+	<!-- Google Tag Manager -->
+	<!--<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
+	<!-- End Google Tag Manager -->
+	
+	<div id="game-container">
+		<canvas id="game" width="960" height="640"></canvas>
+	</div>
+
+	<img src="ship.svg" id="ship" hidden />
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="game.map.js"></script>
+	<script type="text/javascript" src="game.player.js"></script>
+
+	
+	<script>
+
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+	
+
+		ready(game.load);
+
+
+	</script>
+
+</body>
+
+</html>
+
+
