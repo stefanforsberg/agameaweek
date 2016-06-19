@@ -1,17 +1,12 @@
-<!--
-http://www.williammalone.com/articles/html5-canvas-example/
-http://gamedevelopment.tutsplus.com/tutorials/cave-levels-cellular-automata--gamedev-9664
-http://www.roguebasin.com/index.php?title=Mysterious_Space
--->
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-	<title>Tickets</title>
+	<title>Someone's sky</title>
 	<style type="text/css">
 		body {
 			color: #ffffff;
+			background-color: #131313;
 			font-family: 'Press Start 2P'
 		}
 
@@ -58,13 +53,13 @@ http://www.roguebasin.com/index.php?title=Mysterious_Space
 <body>
 
 	<!-- Google Tag Manager -->
-	<!--<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
 	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>
 	<!-- End Google Tag Manager -->
 	
 	<div id="game-container">
@@ -72,6 +67,7 @@ http://www.roguebasin.com/index.php?title=Mysterious_Space
 	</div>
 
 	<img src="ship.svg" id="ship" hidden />
+	<img src="ship_l.svg" id="ship_l" hidden />
 
 	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
@@ -79,6 +75,7 @@ http://www.roguebasin.com/index.php?title=Mysterious_Space
 	<script type="text/javascript" src="game.js"></script>
 	<script type="text/javascript" src="game.map.js"></script>
 	<script type="text/javascript" src="game.player.js"></script>
+	<script type="text/javascript" src="game.collision.js"></script>
 
 	
 	<script>
