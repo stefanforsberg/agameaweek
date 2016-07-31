@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Level creator</title>
+</head>
+
+<body>
+	
+	<script>
+
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+	
+
+		ready(game.load);
+
+
+	</script>
+
+	<div level>
+
+</body>
+
+</html>
+
+
