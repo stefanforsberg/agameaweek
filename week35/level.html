@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>Level creator</title>
+	<style>
+		[data-wall-left="1"] {
+			border-left: solid 1px #000000 !important;
+		}
+
+		[data-wall-right="1"] {
+			border-right: solid 1px #000000 !important;
+		}
+
+		[data-wall-top="1"] {
+			border-top: solid 1px #000000 !important;
+		}
+
+		[data-wall-bottom="1"] {
+			border-bottom: solid 1px #000000 !important;
+		}
+
+	</style>
+</head>
+
+<body>
+
+	<label><input type="radio" value="left" name="wall" checked="checked"> LEFT</label>
+
+	<label><input type="radio" value="right" name="wall" > RIGHT</label>
+	
+	<label><input type="radio" value="top" name="wall" > TOP</label>
+
+	<label><input type="radio" value="bottom" name="wall" > BOTTOM</label>
+
+	<div id="level">
+	</div>
+
+	<input type="text" id="maxX" value="10">
+	<input type="text" id="maxY" value="10">
+
+	<button onclick="generateLevel();">Generate</button>
+
+	<button onclick="getLevelData();">Get</button>
+
+	<textarea id="levelData" cols="10" rows="10"></textarea>
+
+	<script>
+	
+		var level = document.getElementById("level");
+
+		var maxX;
+		var maxY;
+
+		function generateLevel() {
+
+			maxY = document.getElementById("maxX").value;
+			maxX = document.getElementById("maxY").value;
+
+			level.style.width = 40*maxX + "px";
+
+			for(var y = 0; y < maxY; y++) {
+				for(var x = 0; x < maxX; x++) {
+					addElement(x, y);
+				}
+			}
+		}
+
+		function getLevelData() {
+
+			var totalData = "";
+
+			for(var y = 0; y < maxY; y++) {
+
+				var xData = "["
+				for(var x = 0; x < maxX; x++) {
+					var e = document.querySelector("[data-x='" + x + "'][data-y='" + y + "']")
+
+					xData += "[" + e.getAttribute("data-wall-left") + "," + e.getAttribute("data-wall-top") + "," + e.getAttribute("data-wall-right") + "," + e.getAttribute("data-wall-bottom") + "],";
+				}
+
+				xData = xData.substring(0, xData.length-2) + "]]"
+
+				totalData += "this.level.push(" + xData + ")\n"
+
+
+			}
+
+			console.log(totalData);
+		}
+
+		function addElement(x, y) {
+			var e = document.createElement("div");
+			e.style.float = "left"
+			e.style.boxSizing = "border-box";
+			e.style.width = "40px";
+			e.style.height = "40px";
+			e.style.border = "dashed 1px #989898"
+			e.setAttribute("data-x", x);
+			e.setAttribute("data-y", y);
+			e.setAttribute("data-wall-left", x === 0 ? 1 : 0);
+			e.setAttribute("data-wall-right", x === (maxX-1) ? 1 : 0 );
+			e.setAttribute("data-wall-top", y === 0 ? 1 : 0);
+			e.setAttribute("data-wall-bottom", y === (maxY-1) ? 1 : 0);
+			
+			e.addEventListener("click", function() { 
+				handleClick(e);
+			})
+			level.appendChild(e);
+		}
+
+		function handleClick(e) {
+
+			var x = parseInt(e.getAttribute("data-x"));
+			var y = parseInt(e.getAttribute("data-y"));
+
+			var otherSideWallType = ";"
+
+			var wallType = document.querySelector("[name='wall']:checked").value;
+
+			switch(wallType) {
+				case "left":
+					x--;
+					otherSideWallType = "right"	
+					break;
+				case "right":
+					x++;
+					otherSideWallType = "left"	
+					break;	
+
+				case "bottom":
+					y++;
+					otherSideWallType = "top"	
+					break;					
+
+				case "top":
+					y--;
+					otherSideWallType = "bottom"	
+					break;			
+			}
+
+			var otherSideOfWall = document.querySelector("[data-x='" + x + "'][data-y='" + y + "']")
+
+			toggleAttribute(otherSideOfWall, "data-wall-" + otherSideWallType);
+
+			toggleAttribute(e, "data-wall-" + wallType);
+		}
+
+		function toggleAttribute(e, name) {
+
+			if(!e) {
+				return;
+			}
+
+			var value = e.getAttribute(name)
+
+			console.log(value)
+
+			if(value) {
+				if(value === "1") {
+					e.setAttribute(name, "0");	
+				} else {
+					e.setAttribute(name, "1");
+				}
+			} else {
+				e.setAttribute(name, "1");
+			}
+		}
+
+
+	</script>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="door_data" version="1.3.0" audacityversion="2.1.0" sel0="6.4997473793" sel1="8.9912213022" vpos="0" h="2.7416737141" zoom="191.8536101836" rate="44100.0" snapto="off" selectionformat="hh:mm:ss + milliseconds">
+	<tags>
+		<tag name="YEAR" value="2016-08-21T21:36:09+0200"/>
+		<tag name="Software" value="Lavf57.46.100"/>
+	</tags>
+	<wavetrack name="01" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="108897">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000ab0.au" len="108897" min="-0.703742" max="0.559534" rms="0.01348"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+		<waveclip offset="10.86736961">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="27136">
+				<waveblock start="0">
+					<simpleblockfile filename="e000009b.au" len="27136" min="-0.703742" max="0.559534" rms="0.018798"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+		<waveclip offset="6.49974738">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="109874">
+				<waveblock start="0">
+					<simpleblockfile filename="e000065c.au" len="109874" min="-0.690422" max="0.579329" rms="0.033624"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="02" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="109874">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000efe.au" len="109874" min="-0.139196" max="0.146035" rms="0.03077"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="teleport" channel="0" linked="1" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="2.58530612">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="169344">
+				<waveblock start="0">
+					<pcmaliasblockfile summaryfile="e0000552.auf" aliasfile="D:\teleport.wav" aliasstart="0" aliaslen="169344" aliaschannel="0" min="-0.747665" max="0.764624" rms="0.120532"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+	<wavetrack name="teleport" channel="1" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="0" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="2.58530612">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="169344">
+				<waveblock start="0">
+					<pcmaliasblockfile summaryfile="e00009b5.auf" aliasfile="D:\teleport.wav" aliasstart="0" aliaslen="169344" aliaschannel="1" min="-0.747665" max="0.764624" rms="0.120511"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>

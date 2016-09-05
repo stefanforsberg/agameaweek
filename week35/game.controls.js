@@ -4,8 +4,6 @@ game.controls = {
 	},
 	handleKeyDown: function(e) {
 
-		console.log(e.keyCode)
-
 		switch(e.keyCode) {
 
 			case 65:
@@ -42,7 +40,12 @@ game.controls = {
 				game.player.moveBack();
 				e.preventDefault();
 				game.renderScene.render();
-				break;				
+				break;	
+
+			case 32:
+				game.buttons.action();
+				e.preventDefault();
+				break;			
 		}
 
 
