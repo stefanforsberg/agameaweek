@@ -18,6 +18,7 @@ game.load = function() {
 	    	playerHit: [950,300],
 	    	enemyHit: [1920,300],
 	    	powerup: [2870,350],
+	    	death: [3350, 1000]
 	  	},
 		onload: function() {
 			game.init();
@@ -303,9 +304,7 @@ game.player = {
 	},
 	death: function() {
 		game.dying = true;
-		game.sounds[0].play("playerHit");
-		game.sounds[0].play("playerHit");
-		game.sounds[0].play("playerHit");
+		game.sounds[0].play("death");
 		game.explosions.add(game.player.x+16, game.player.y+16, 100);
 	},
 	upgradeWeapon: function() {
