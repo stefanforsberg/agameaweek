@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Eye of the observer</title>
+	<style type="text/css">
+
+	
+		html {
+		}
+			
+		body {
+			background-color: rgba(20,20,20,1);
+
+			max-height: 100%;
+		}
+
+		a, a:hover, a:active, a:visited {
+			color: inherit;
+		}
+
+		@keyframes AnimationName { 
+		    0%{background-position:99% 0%}
+		    50%{background-position:2% 100%}
+		    100%{background-position:99% 0%}
+		}
+
+		#game-container {
+			width: 100%;
+			height: 100%;
+			margin: auto;
+			text-align: center;
+			position: relative;
+		}
+
+		#gameText {
+		  position: absolute;
+		  top: 50%; left: 50%;
+		  transform: translate(-50%,-50%);
+		  font-family: 'Bungee', cursive;
+		  font-size: 5em;
+		  color: rgba(255,255,255,0.6);
+		  text-shadow: 0px 0px 10px rgba(0,0,0,0.1), 0px 0px 25px rgba(255,255,255,0.1)
+		}
+
+		#text {
+			display: none;
+		}
+
+	</style>
+
+	<link href="https://fonts.googleapis.com/css?family=Bungee" rel="stylesheet">
+</head>
+
+<body>
+
+	<!-- Google Tag Manager -->
+	<!--<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-5QPCLS"
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-5QPCLS');</script>-->
+	<!-- End Google Tag Manager -->
+	
+	<div id="game-container">
+		<canvas id="game" width="640" height="480"></canvas>
+	</div>
+
+	<img src="bg01.png" id="bg01" hidden/>
+	<img src="bg02.png" id="bg02" hidden/>
+	<img src="bg03.png" id="bg03" hidden/>
+	<img src="bg04.png" id="bg04" hidden/>
+	<img src="bg05.png" id="bg05" hidden/>
+
+	<img src="ship.png" id="ship" hidden/>
+	<img src="moon.png" id="moon" hidden/>
+	<img src="laser.png" id="laser" hidden/>
+	<img src="enemy01.png" id="enemy01" hidden/>
+	<img src="enemy02.png" id="enemy02" hidden/>
+	<img src="enemy03.png" id="enemy03" hidden/>
+	<img src="electrical.png" id="electrical" hidden/>
+	<img src="electrical2.png" id="electrical2" hidden/>
+	<img src="powerup.png" id="powerup" hidden/>
+
+
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.7/rx.all.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.28/howler.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="game.shots.js"></script>
+	<script type="text/javascript" src="game.enemies.js"></script>
+	<script type="text/javascript" src="game.level.js"></script>
+	<script type="text/javascript" src="game.powerup.js"></script>
+	
+	<script>
+
+		var game = game || {};
+
+		function ready(fn) {
+		  if (document.readyState != 'loading'){
+
+		    fn();
+		  } else {
+		    document.addEventListener('DOMContentLoaded', fn);
+		  }
+		}
+	
+
+		ready(game.load);
+
+
+	</script>
+
+</body>
+
+</html>
+
+

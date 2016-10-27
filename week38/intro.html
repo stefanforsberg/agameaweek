@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Eye of the observer</title>
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+	<style>
+		body {
+			background-color: #000000;
+		}
+		#game-container {
+			width: 100%;
+			height: 100%;
+			margin: auto;
+			text-align: center;
+			position: relative;
+		}
+	</style>
+</head>
+<body>
+	<div id="game-container">
+		<canvas id="canvas" width="640" height="480"></canvas>
+	</div>
+<script>
+	// https://gist.github.com/kirkegaard/1047913
+	(function() {
+
+    var SCREEN_WIDTH  = 640,
+        SCREEN_HEIGHT = 480,
+        canvas        = document.getElementById('canvas'),
+        context       = canvas.getContext('2d'),
+        res           = 48,
+        rad           = Math.PI / 180,
+        aa = ab = ac = ad = 0,
+        cr = cg = cb  = 128, // COLOR
+        a             = seed(6),
+        HALF_WIDTH    = Math.ceil(SCREEN_WIDTH / res),
+        HALF_HEIGHT   = Math.ceil(SCREEN_HEIGHT / res);
+
+    var texts = [];
+
+    init();
+
+    function init() {
+    	var style = canvas.getAttribute('style') || '';
+		var scale = Math.min(window.innerWidth/canvas.width,window.innerHeight/canvas.height)*0.95;
+		canvas.setAttribute('style', style + ' ' + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; -o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');');
+
+
+        texts.push(new text(65,140,35, 10, "TRASH SOFTWARE", "40px 'Press Start 2P'", "rgba(255,255,255,0.3)", "rgba(0,0,0,1)"));
+
+        texts.push(new text(130,290,20, 4, "Cracked by raven_x", "20px 'Press Start 2P'", "rgba(255,255,255,0.6)", "rgba(0,0,0,0.1)"));
+
+        texts.push(new text(170,390,20, 4, "Music by keez", "20px 'Press Start 2P'", "rgba(255,255,255,0.6)", "rgba(0,0,0,0.1)"));
+		
+
+        draw();
+    }
+
+    function draw() {
+    	context.clearRect(0,0,640,480)
+
+    	plasma();
+
+    	texts.forEach(function (t) {
+    		drawText(t);
+    	})
+
+    	window.requestAnimationFrame(draw);
+    }
+
+    function plasma() {
+
+        for(var x = 0; x < res; x++) {
+
+            aa -= 0.000005 * Math.cos(rad * x * a[0]);
+            ac -= 0.00007 * Math.sin(rad * (res - x) * a[2]);
+
+            for(var y = 0; y < res; y++) {
+
+                ab += 0.0002 * Math.cos(rad * y * a[1]);
+                ad += 0.0001 * Math.sin(rad * (res - y) * a[3]);
+
+                var h = x * 8 * Math.sin(rad * (aa + ab) * a[4]),
+                    j = y * 8 * Math.cos(rad * (ac + ad) * a[5]),
+                    k = (x * a[0] + y * a[1]) * 32 * Math.sin(rad * ((res - x) * h + (y - res) * h) * a[2] / 720),
+                    l = (res * a[3] - x  * a[3] + (res * a[4] - y * a[4])) * 32 * Math.sin(rad * (x * h + y * j) * a[5] / 720);
+
+                h = 24 * Math.cos(rad * h) + 42 * Math.cos(rad * j);
+
+
+                cr = 128 + Math.ceil(42 * Math.cos(rad * k) + h);
+                cg = 128 + Math.ceil(42 * Math.cos(rad * l) + h);
+                cb = Math.ceil((cr + cg) / 2 - h * 2);
+
+                context.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+                context.fillRect(y * HALF_WIDTH, x * HALF_HEIGHT, HALF_WIDTH, HALF_HEIGHT);
+
+            }
+
+        }
+
+    }
+
+    function text(x, y, dX, dY, t, font, fillStyle, strokeStyle) {
+    	this.x = x;
+    	this.dX = dX;
+    	this.y = y;
+    	this.dY = dY;
+    	this.items = t.split("");
+    	this.c = Math.floor(Math.random()*360);
+    	this.font = font;
+    	this.fillStyle = fillStyle;
+    	this.strokeStyle = strokeStyle;
+    	return this;
+    }
+
+    function drawText(t) {
+    	t.items.forEach(function (letter, index) {
+
+			context.font = t.font;
+
+			if(t.fillStyle) {
+				context.fillStyle = t.fillStyle
+				context.fillText(letter,t.x + index*t.dX,t.y + t.dY*(index-t.items.length/2)*Math.sin( (t.c+index*3)*(rad) ) );
+			}
+			if(t.strokeStyle) {
+				context.strokeStyle = t.strokeStyle
+				context.strokeText(letter,t.x + index*t.dX,t.y + t.dY*(index-t.items.length/2)*Math.sin( (t.c+index*3)*(rad) ) );
+			}
+    		
+    	})
+
+    	t.c++;
+    }
+
+    function seed(count) {
+        var res = [];
+        for(var i = 0; i < count; i++) {
+            res[i] = Math.ceil(Math.random(0, 1) * 3 + 1);
+        }
+        return res;
+    }
+
+	})();
+</script>
+</body>
+</html>
