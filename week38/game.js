@@ -12,7 +12,7 @@ game.load = function() {
 
 	game.sounds = [];
 	game.sounds[0] = new Howl({
-		urls: ['sfx.mp3'],
+		urls: ['SFX.mp3'],
 		sprite: {
 	    	laser: [0, 200],
 	    	playerHit: [950,300],
