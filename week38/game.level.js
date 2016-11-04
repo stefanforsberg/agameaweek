@@ -1,97 +1,67 @@
 game.level = {
 	update: function() {
 
-		if(game.pos === 10) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
+		this.enemy03Pattern01(10);
 
-		if(game.pos === 40) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 70) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 300) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 330) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 360) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
+		this.enemy03Pattern01(300);
 
 		if(game.pos === 460) {
 			game.enemies.add(new game.enemies.enemy01(700, 240))
 		}
 
-		if(game.pos === 600) {
-			game.enemies.add(new game.enemies.enemy04(-50, 300))
-		} 
+		this.enemy04Pattern01(600);
 
-		if(game.pos === 630) {
-			game.enemies.add(new game.enemies.enemy04(-50, 330))
-		} 
+		this.enemy03Pattern01(810);
 
-		if(game.pos === 660) {
-			game.enemies.add(new game.enemies.enemy04(-50, 350))
-		}
 
-		if(game.pos === 810) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
+		this.enemy03Pattern01(1100);
 
-		if(game.pos === 840) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 870) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 1100) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 1130) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
-
-		if(game.pos === 1160) {
-			game.enemies.add(new game.enemies.enemy03(700, 100))
-		} 
 
 		if(game.pos === 1260) {
 			game.enemies.add(new game.enemies.enemy01(700, 240))
 		}
 
-		if(game.pos === 1200) {
-			game.enemies.add(new game.enemies.enemy04(-50, 300))
-		} 
-
-		if(game.pos === 1230) {
-			game.enemies.add(new game.enemies.enemy04(-50, 330))
-		} 
-
-		if(game.pos === 1260) {
-			game.enemies.add(new game.enemies.enemy04(-50, 350))
-		}
+		this.enemy04Pattern01(1200);
 
 		if(game.pos === 1450) {
 			game.enemies.add(new game.enemies.enemy05(700, 120))
-		} 
-
-		if(game.pos === 1450) {
 			game.enemies.add(new game.enemies.enemy05(700, 220))
 		} 
 
 
-		this.electricalPattern01(1800);
+
+		this.electricalPattern02(1800);
+
+		// this.electricalPattern01(1800);
 		
+	},
+
+	enemy03Pattern01: function(s) {
+		if(game.pos === s) {
+			game.enemies.add(new game.enemies.enemy03(700, 100))
+		} 
+
+		if(game.pos === s+30) {
+			game.enemies.add(new game.enemies.enemy03(700, 100))
+		} 
+
+		if(game.pos === s+60) {
+			game.enemies.add(new game.enemies.enemy03(700, 100))
+		} 
+	},
+
+	enemy04Pattern01: function(s) {
+		if(game.pos === s) {
+			game.enemies.add(new game.enemies.enemy04(-50, 300))
+		} 
+
+		if(game.pos === s+30) {
+			game.enemies.add(new game.enemies.enemy04(-50, 330))
+		} 
+
+		if(game.pos === s+60) {
+			game.enemies.add(new game.enemies.enemy04(-50, 350))
+		}
 	},
 
 	electricalPattern01: function(s) {
@@ -116,5 +86,18 @@ game.level = {
 		if(game.pos === s+460) {
 			game.enemies.add(new game.enemies.electrical(700, 0, 416, game.enemies.electricalImg, false))
 		} 
+	},
+	electricalPattern02: function(s) {
+		if(game.pos === s) {
+			game.enemies.add(new game.enemies.electrical(700, 176, 128, game.enemies.electricalImg, false))
+		}
+
+		if(game.pos === s+70) {
+			game.enemies.add(new game.enemies.electrical(700, 0, 128, game.enemies.electricalImg, false))
+		}
+
+		if(game.pos === s+140) {
+			game.enemies.add(new game.enemies.electrical(700, 352, 128, game.enemies.electricalImg, false))
+		}
 	}
 }

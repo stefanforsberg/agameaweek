@@ -37,14 +37,6 @@ game.enemies = {
 							if(!e.electrical) {
 			 					game.explosions.add(e.x+16, e.y+16, 100)
 
-			 					window.setTimeout(function() {
-			 						game.explosions.add(e.x+18, e.y+16, 35)
-			 					}, 100)
-
-			 					window.setTimeout(function() {
-			 						game.explosions.add(e.x+14, e.y+14, 35)
-			 					}, 150)
-
 			 					game.sounds[0].play("enemyHit");
 
 		 						game.powerup.add(e.x+10, e.y+10);

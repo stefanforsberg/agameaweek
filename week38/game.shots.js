@@ -76,7 +76,7 @@ game.shots.shot.prototype.draw = function() {
 	this.x += this.dx();
 	this.y += this.dy();
 
-	if(this.x < -10 || this.x > 650 || this.y < -10 || this.y > 650) {
+	if(this.x < -3 || this.x > 640 || this.y < -3 || this.y > 480) {
 		this.remove = true;
 	}
 

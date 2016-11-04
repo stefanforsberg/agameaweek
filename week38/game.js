@@ -117,7 +117,8 @@ game.backgrounds = {
 
 		this.bg01 = new game.background("bg01", 0, 472,4);
 		this.bg02 = new game.background("bg02", 0, 330,0.01);
-		this.bg03 = new game.background("bg03", 0, 330,0.15);
+		this.bg032 = new game.background("bg032", 0, 330,0.15);
+		this.bg03 = new game.background("bg03", 0, 330,0.54);
 		this.bg04 = new game.background("bg04", 0, 330,1);
 		this.bg05 = new game.background("bg05", 0, 330,1.5);
 
@@ -136,6 +137,7 @@ game.backgrounds = {
 
 		this.bg01.draw();
 		this.bg02.draw();
+		this.bg032.draw();
 		this.bg03.draw();
 		this.bg04.draw();
 		this.bg05.draw();
@@ -204,7 +206,7 @@ game.player = {
 		this.x = 50;
 		this.y = 300;
 		this.img = document.getElementById("ship");
-		this.weapon = 1;
+		this.weapon = 3;
 		this.weaponCooldown = 0;
 		this.fumes = [];
 		this.width = 32;
@@ -257,6 +259,14 @@ game.player = {
 						game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 						break;						
+					case 3:
+						game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+						game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+						game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
+						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))
+
+						break;									
 				}
 
 				this.weaponCooldown = 20;
