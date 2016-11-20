@@ -12,11 +12,6 @@ game.powerup = {
 
 		if(r < 0.05) {
 			item = new game.powerup.item(x,y);
-			item.sx = 0;
-			item.sy = 0;
-			item.hit = function() { game.player.upgradeWeapon() } ;
-		} else 	if(r >= 0.05 && r < 0.1) {
-			item = new game.powerup.item(x,y);
 			item.sx = 16;
 			item.sy = 0;
 			item.hit = function() { game.player.upgradeHealth() } ;

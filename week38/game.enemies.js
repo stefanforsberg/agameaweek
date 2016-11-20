@@ -35,11 +35,13 @@ game.enemies = {
  						if(isShot) {
 
 							if(!e.electrical) {
-			 					game.explosions.add(e.x+16, e.y+16, 100)
+			 					game.explosions.add(e.x+16, e.y+16, 40)
 
 			 					game.sounds[0].play("enemyHit");
 
 		 						game.powerup.add(e.x+10, e.y+10);
+
+								game.status.addXp(e.xp || 10); 
 							}
 
 
@@ -84,26 +86,26 @@ game.enemies.enemy01.prototype.draw = function() {
 	this.shootTimer--;
 
 	if(this.shootTimer < 0) {
-		game.shots.addEnemy(new game.shots.shot(this.x, this.y+16, function() { return -4; }, function() { return 0; }, game.shots.shot2Img))
+		game.shots.addEnemy(new game.shots.shot(this.x, this.y+14, function() { return -4; }, function() { return 0; }, game.shots.shot2Img))
 		this.shootTimer = 100;
 	}
 }
 
-game.enemies.enemy02 = function(x,y) {
+game.enemies.enemy02 = function(x,y,a) {
 	this.x = x;
 	this.y = y;
 	this.width = 32;
 	this.height = 32;
 	this.shootTimer = 100;
 	this.img = game.enemies.enemy02img;
-	this.shootable = true;
-	this.a = 0;
+	this.shootable = false;
+	this.a = a;
 	return this;
 }
 
 game.enemies.enemy02.prototype.draw = function() {
 	game.context.drawImage(this.img, this.x, this.y)
-	this.x-=2;
+	this.x-=1;
 	this.y += 0.7*Math.sin(this.a*Math.PI/180)
 
 	if(this.x < -40) {
@@ -113,16 +115,16 @@ game.enemies.enemy02.prototype.draw = function() {
 	this.shootTimer--;
 
 	if(this.shootTimer < 0) {
-		game.shots.addEnemy(new game.shots.shot(this.x, this.y+16, function() { return -3; }, function() { return 0; }, game.shots.shot2Img))
-		game.shots.addEnemy(new game.shots.shot(this.x, this.y+16, function() { return 0; }, function() { return -3; }, game.shots.shot2Img))
-		game.shots.addEnemy(new game.shots.shot(this.x, this.y+16, function() { return 0; }, function() { return 3; }, game.shots.shot2Img))
+		game.shots.addEnemy(new game.shots.shot(this.x, this.y+14, function() { return -3; }, function() { return 0; }, game.shots.shot2Img))
+		game.shots.addEnemy(new game.shots.shot(this.x, this.y+14, function() { return 0; }, function() { return -3; }, game.shots.shot2Img))
+		game.shots.addEnemy(new game.shots.shot(this.x, this.y+14, function() { return 0; }, function() { return 3; }, game.shots.shot2Img))
 		this.shootTimer = 100;
 	}
 
 	this.a++;
 }
 
-game.enemies.enemy03 = function(x,y) {
+game.enemies.enemy03 = function(x,y, shoot) {
 	this.x = x;
 	this.y = y;
 	this.width = 32;
@@ -132,6 +134,8 @@ game.enemies.enemy03 = function(x,y) {
 	this.c = 0;
 	this.spriteIndex = 0;
 	this.shootable = true;
+	this.shoot = shoot;
+	this.shootTimer = 70;
 	return this;
 }
 
@@ -172,6 +176,18 @@ game.enemies.enemy03.prototype.draw = function() {
 			this.remove = true;
 		}
 	}
+
+	if(this.shoot) {
+		this.shootTimer--;
+
+		if(this.shootTimer < 0) {
+			var vx = Math.random() > 0.5 ? -1 : 1;
+			var vy = Math.random() > 0.5 ? -1 : 1;
+			game.shots.addEnemy(new game.shots.shot(this.x+14, this.y+14, function() { return vx; }, function() { return vy; }, game.shots.shot2Img))
+			this.shootTimer = 70;
+		}
+	}
+
 }
 
 game.enemies.enemy04 = function(x,y) {
@@ -183,6 +199,7 @@ game.enemies.enemy04 = function(x,y) {
 	this.img = game.enemies.enemy03img;
 	this.c = 0;
 	this.spriteIndex = 0;
+	this.shootTimer = 50;
 	this.shootable = true;
 	return this;
 }
@@ -223,6 +240,15 @@ game.enemies.enemy04.prototype.draw = function() {
 		if(this.x > 650) {
 			this.remove = true;
 		}
+	}
+
+	this.shootTimer--;
+
+	if(this.shootTimer < 0) {
+		var vx = Math.random() > 0.5 ? -1 : 1;
+		var vy = Math.random() > 0.5 ? -1 : 1;
+		game.shots.addEnemy(new game.shots.shot(this.x, this.y+14, function() { return vx; }, function() { return vy; }, game.shots.shot2Img))
+		this.shootTimer =50;
 	}
 }
 
@@ -319,8 +345,8 @@ game.explosions = {
 game.explosion = function(x, y) {
 	this.x = x
 	this.y = y
-	this.dx = 2*Math.random();
-	this.dy = (-2 + 4*Math.random()) / 6;
+	this.dx = Math.random();
+	this.dy = (-2 + 4*Math.random()) / 4;
 	this.startYellow = Math.floor(Math.random()*255);
 	this.alpha = 0.75 + Math.random()*0.15;
 	this.size = 2 + Math.random()*3;
@@ -330,15 +356,15 @@ game.explosion = function(x, y) {
 game.explosion.prototype.draw = function() {
 	game.context.fillStyle = "rgba(255," + this.startYellow + ",0," + this.alpha + ")";
 	game.context.fillRect(this.x, this.y, this.size, this.size);
-	this.alpha -= 0.01;
+	this.alpha -= 0.04;
 
 	if(this.startYellow > 0) {
 		this.startYellow--;	
 	}
 
 	
-	this.x += this.dx *(1-this.alpha);
-	this.y += this.dy * 3*(1-this.alpha);
+	this.x += this.dx;
+	this.y += this.dy;
 
-	this.size -= 0.03;
+	//this.size -= 0.03;
 }

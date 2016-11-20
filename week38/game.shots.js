@@ -4,37 +4,9 @@ game.shots = {
  		this.items = [];
  		this.itemsEnemy = [];
 
- 		this.shotImg = document.createElement("canvas");
-		this.shotImg.width = 6;
-		this.shotImg.height = 1;
-		var context = this.shotImg.getContext("2d")
+		 this.shotImg = document.getElementById("shot");
 
-		context.fillStyle = "rgba(255,255,255,0.8)"
-		context.fillRect(2,0,2,1);
-		context.fillStyle = "rgba(255,255,255,0.4)"
-		context.fillRect(1,0,1,1);
-		context.fillRect(4,0,1,1);
-		context.fillStyle = "rgba(255,255,255,0.1)"
-		context.fillRect(0,0,1,1);
-		context.fillRect(5,0,1,1);
-
- 		this.shot2Img = document.createElement("canvas");
-		this.shot2Img.width = 3;
-		this.shot2Img.height = 3;
-		context = this.shot2Img.getContext("2d")
-
-		context.fillStyle = "rgba(255,255,255,1)"
-		context.fillRect(1,1,1,1);
-		context.fillStyle = "rgba(255,255,255,0.7)"
-		context.fillRect(1,0,1,1);
-		context.fillRect(0,1,1,1);
-		context.fillRect(2,1,1,1);
-		context.fillRect(1,2,1,1);	
-		context.fillStyle = "rgba(255,255,255,0.4)"
-		context.fillRect(0,0,1,1);
-		context.fillRect(2,0,1,1);
-		context.fillRect(0,2,1,1);
-		context.fillRect(2,2,1,1);		
+		 this.shot2Img = document.getElementById("shot2");
  	},
  	add: function(s) {
  		

@@ -13,6 +13,7 @@ game.load = function() {
 	game.sounds = [];
 	game.sounds[0] = new Howl({
 		urls: ['SFX.mp3'],
+		volume: 0.5,
 		sprite: {
 	    	laser: [0, 200],
 	    	playerHit: [950,300],
@@ -44,6 +45,8 @@ game.init = function() {
 	game.enemies.init();
 	game.explosions.init();
 	game.powerup.init();
+	game.boss.init();
+	game.status.init();
 	game.running = true;
 
 	game.dyingCounter = 0;
@@ -67,6 +70,7 @@ game.draw = function() {
 			game.backgrounds.draw();
 			game.enemies.draw();
 			game.explosions.draw();
+			game.status.draw();
 			game.level.update();
 
 			game.dyingCounter += 0.01;
@@ -83,14 +87,32 @@ game.draw = function() {
 		
 	} else {
 		game.context.clearRect(0,0,640,480);
+
+		if(game.boss.entering) {
+			game.context.save();
+			var dx = Math.random()*5;
+			var dy = Math.random()*5;
+			game.context.translate(dx, dy);  
+		}
+
 		game.backgrounds.draw();
 		game.player.draw();
 		game.shots.draw();
 		game.enemies.draw();
+		game.boss.draw();
 		game.explosions.draw();
 		game.powerup.draw();
+		game.status.draw();
 		game.level.update();
 		game.pos++;
+
+		if(game.boss.entering) {
+			game.context.restore();
+
+			if(game.boss.active) {
+				game.boss.entering = false;
+			}
+		}
 	}
 
 
@@ -124,16 +146,33 @@ game.backgrounds = {
 
 		this.stars = [];
 
+		this.starBg = document.createElement("canvas");
+		this.starBg.width = 640;
+		this.starBg.height = 480;
+		var context = this.starBg.getContext("2d")
+
 		for(var i = 0; i < 100; i++) {
-			this.stars.push(new game.star());
+			var x = Math.random()*640;
+			var y = Math.random()*200;
+			var alpha = 0.75*Math.random();
+			var size = Math.random()*1.4;
+			var b = 220 + Math.floor(Math.random()*35);
+
+			context.beginPath();
+			context.fillStyle = "rgba(255,255,"+ b +"," + alpha + ")";
+			context.arc(x,y,size,0,2*Math.PI);
+			context.fill();
 		}
+
+		context.drawImage(document.getElementById("moon"), 550, 50)
+
 	},
 	draw: function() {
 
 		game.context.fillStyle = this.grd;
 		game.context.fillRect(0,0,640,400)
 
-		game.context.drawImage(document.getElementById("moon"), 550, 50)
+		game.context.drawImage(this.starBg, 0, 0)
 
 		this.bg01.draw();
 		this.bg02.draw();
@@ -206,7 +245,7 @@ game.player = {
 		this.x = 50;
 		this.y = 300;
 		this.img = document.getElementById("ship");
-		this.weapon = 3;
+		this.weapon = 1;
 		this.weaponCooldown = 0;
 		this.fumes = [];
 		this.width = 32;
@@ -219,62 +258,76 @@ game.player = {
 	},
 	draw: function() {
 
-		var px = this.x;
-		var py = this.y;
+		if(!game.boss.entering) {
+			
+			
 
-		if(game.keys.pressed.u) {
-			py-=3;
-		} else if(game.keys.pressed.d) {
-			py+=3;
-		}
+			var px = this.x;
+			var py = this.y;
 
-		if(game.keys.pressed.l) {
-			px-=3;
-		} else if(game.keys.pressed.r) {
-			px+=3;
-		}
+			if(game.keys.pressed.u) {
+				py-=3;
+			} else if(game.keys.pressed.d) {
+				py+=3;
+			}
 
-		if(px < 10 || px > 600) {
-			px = this.x;
-		}
+			if(game.keys.pressed.l) {
+				px-=3;
+			} else if(game.keys.pressed.r) {
+				px+=3;
+			}
 
-		if(py < 10 || py > 440) {
-			py = this.y;
-		}
+			if(px < 10 || px > 600) {
+				px = this.x;
+			}
 
-		this.y = py;
-		this.x = px;
+			if(py < 10 || py > 440) {
+				py = this.y;
+			}
 
-		if(game.keys.pressed.space) {
-			if(this.weaponCooldown === 0) {
+			this.y = py;
+			this.x = px;
 
-				game.sounds[0].play("laser");
-				
-				switch(this.weapon) {
-					case 1:
-						game.shots.add(new game.shots.shot(this.x+32, this.y+16, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						break;
-					case 2:
-						game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						break;						
-					case 3:
-						game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
-						game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))
+			if(game.keys.pressed.space) {
+				if(this.weaponCooldown === 0) {
 
-						break;									
-				}
+					game.sounds[0].play("laser");
+					
+					switch(this.weapon) {
+						case 1:
+							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							break;
+						case 2:
+							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							break;						
+						case 3:
+							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))
+							break;									
+						case 4:
+							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))	
+							game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 3; }, function() { return -3; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 3; }, function() { return 3; }, game.shots.shotImg))
+							break;
+					}
 
-				this.weaponCooldown = 20;
-			} 
-		}
+					this.weaponCooldown = 20;
+				} 
+			}
 
-		if(this.weaponCooldown > 0) {
-			this.weaponCooldown--;
+			if(this.weaponCooldown > 0) {
+				this.weaponCooldown--;
+			}
+
 		}
 
 		game.enemies.items.forEach(function (e) {
@@ -302,6 +355,13 @@ game.player = {
 			f.draw();
 		});
 
+		game.context.save();
+		for(var i = 0; i < this.health; i++) {
+			game.context.fillStyle = "rgba(255,255,255,0.5)"
+			game.context.fillRect(this.x -15, this.y + 3 +10*i , 5, 5)
+		}
+		game.context.restore();
+
 		game.context.drawImage(this.img, this.x, this.y)
 
 	},
@@ -318,7 +378,7 @@ game.player = {
 		game.explosions.add(game.player.x+16, game.player.y+16, 100);
 	},
 	upgradeWeapon: function() {
-		if(this.weapon < 2) {
+		if(this.weapon < 4) {
 			this.weapon++;
 		}
 	},
