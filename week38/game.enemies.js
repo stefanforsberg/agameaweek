@@ -22,6 +22,8 @@ game.enemies = {
 
  			game.shots.items.forEach(function (s) {
 
+
+
  				if(game.collides(e, s)) {
 
  					if(e.shootable) {
@@ -98,7 +100,7 @@ game.enemies.enemy02 = function(x,y,a) {
 	this.height = 32;
 	this.shootTimer = 100;
 	this.img = game.enemies.enemy02img;
-	this.shootable = false;
+	this.shootable = true;
 	this.a = a;
 	return this;
 }
@@ -275,11 +277,12 @@ game.enemies.enemy05.prototype.draw = function() {
 	this.a+=3;
 }
 
-game.enemies.electrical = function(x,y, height, img, shootable) {
+game.enemies.electrical = function(x,y, height, img, shootable, notMoving) {
 	this.x = x;
 	this.y = y;
 	this.width = 12;
 	this.electrical = true;
+	this.notMoving = notMoving;
 	this.shootable = shootable;
 	this.height = height;
 	this.images = height / 32;
@@ -314,7 +317,10 @@ game.enemies.electrical.prototype.draw = function() {
 		game.context.drawImage(this.img, 12*this.spriteIndex, 0, this.width, this.height, this.x, this.y + 32*i, this.width, this.height)	
 	}
 
-	this.x-= 2;
+	if(!this.notMoving) {
+		this.x-= 2;
+	}
+	
 	
 }
 

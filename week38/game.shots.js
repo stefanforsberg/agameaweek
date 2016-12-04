@@ -22,6 +22,7 @@ game.shots = {
 
  		this.items.forEach(function (s) {
  			s.draw();
+			game.boss.handleShot(s); 
  		})
 
  		this.itemsEnemy.forEach(function (s) {

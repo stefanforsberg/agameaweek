@@ -22,15 +22,20 @@ game.load = function() {
 	    	death: [3350, 1000]
 	  	},
 		onload: function() {
-			game.init();
-			// game.sounds[1] = new Howl({
-			// 	urls: ['song.mp3'], 
-			// 	loop: true,
-			// 	onload: function() {
-			// 		game.sounds[1].play();
-			// 		game.init();	
-			// 	}
-			// })
+			
+			game.sounds[1] = new Howl({
+				urls: ['boss.mp3'], 
+				loop: false,
+				onload: function() {
+					game.sounds[2] = new Howl({
+						urls: ['boss_song.mp3'], 
+						loop: true,
+						onload: function() {
+							game.init();
+						}
+					})
+				}
+			})
 		}		  			
 	});
 
