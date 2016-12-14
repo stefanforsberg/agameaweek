@@ -20,10 +20,22 @@ game.shots = {
  		this.items = _.reject(this.items, function(t) { return t.remove; })
  		this.itemsEnemy = _.reject(this.itemsEnemy, function(t) { return t.remove; })
 
+		var hit = [];
+
  		this.items.forEach(function (s) {
  			s.draw();
-			game.boss.handleShot(s); 
+			if(game.boss.active) {
+				hit.push(game.boss.handleShot(s));
+			}
+			
  		})
+
+		 if(_.some(hit)) {
+			 game.sounds[0].play("enemyHit");
+		 }
+
+		
+			
 
  		this.itemsEnemy.forEach(function (s) {
  			s.draw();

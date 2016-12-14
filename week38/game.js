@@ -43,6 +43,12 @@ game.load = function() {
 }
 
 game.init = function() {
+
+	if(game.requestId) {
+		console.log("running, cancelling animation frame")
+		window.cancelAnimationFrame(game.requestId);
+	}
+
 	game.backgrounds.init();
 	game.player.init();
 	game.keys.init();
@@ -62,16 +68,22 @@ game.init = function() {
 	var scale = Math.min(window.innerWidth/game.canvas.width,window.innerHeight/game.canvas.height);
 	game.canvas.setAttribute('style', style + ' ' + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; -o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');');
 
+	game.texts = [];
+	game.texts.push(new text(110,200,46, 8, "GAME OVER", "40px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+	game.texts.push(new text(80,300,18, 2, "Press any key to try again", "14px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+
 	window.requestAnimationFrame(game.draw);
 }
 
 game.draw = function() {
 
-	
+	game.context.clearRect(0,0,640,480);
 
 	if(game.dying) {
+
+
 		if(game.dyingCounter < 1) {
-			game.context.clearRect(0,0,640,480);
+			
 			game.backgrounds.draw();
 			game.enemies.draw();
 			game.explosions.draw();
@@ -85,13 +97,19 @@ game.draw = function() {
 
 			game.context.fillStyle = "rgba(0,0,0," + game.dyingCounter + ")";
 			game.context.fillRect(0,0,640,480);
+
 		} else {
 			game.running = false;
 		}
+
+		game.context.save();
+		game.texts.forEach(function (t) {
+			drawText(t);
+		})
+		game.context.restore();
 		
 		
 	} else {
-		game.context.clearRect(0,0,640,480);
 
 		if(game.boss.entering) {
 			game.context.save();
@@ -124,9 +142,7 @@ game.draw = function() {
 
 
 
-	if(game.running) {
-		window.requestAnimationFrame(game.draw);	
-	}
+	game.requestId = window.requestAnimationFrame(game.draw);	
 	
 
 
@@ -134,6 +150,7 @@ game.draw = function() {
 
 game.backgrounds = {
 	init: function() {
+		
 
 		this.grd = game.context.createLinearGradient(0, 0, 0, 480);
 
@@ -304,19 +321,19 @@ game.player = {
 							break;
 						case 2:
 							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							break;						
 						case 3:
 							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))
 							break;									
 						case 4:
 							game.shots.add(new game.shots.shot(this.x+20, this.y+1, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
-							game.shots.add(new game.shots.shot(this.x+32, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
+							game.shots.add(new game.shots.shot(this.x+20, this.y+14, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y+27, function() { return 6; }, function() { return 0; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y, function() { return 0; }, function() { return -6; }, game.shots.shotImg))
 							game.shots.add(new game.shots.shot(this.x+20, this.y+26, function() { return 0; }, function() { return 6; }, game.shots.shotImg))	
@@ -380,6 +397,7 @@ game.player = {
 	death: function() {
 		game.dying = true;
 		game.sounds[0].play("death");
+		game.sounds[2].stop();
 		game.explosions.add(game.player.x+16, game.player.y+16, 100);
 	},
 	upgradeWeapon: function() {
@@ -488,3 +506,35 @@ game.collides = function colCheck(shapeA, shapeB) {
     }
     return false;
 };
+
+ function text(x, y, dX, dY, t, font, fillStyle, strokeStyle) {
+	this.x = x;
+	this.dX = dX;
+	this.y = y;
+	this.dY = dY;
+	this.items = t.split("");
+	this.c = Math.floor(Math.random()*360);
+	this.font = font;
+	this.fillStyle = fillStyle;
+	this.strokeStyle = strokeStyle;
+	return this;
+}
+
+function drawText(t) {
+	t.items.forEach(function (letter, index) {
+
+		game.context.font = t.font;
+
+		if(t.fillStyle) {
+			game.context.fillStyle = t.fillStyle
+			game.context.fillText(letter,t.x + index*t.dX,t.y + t.dY*(index-t.items.length/2)*Math.sin( (t.c+index*3)*(game.deg2rad) ) );
+		}
+		if(t.strokeStyle) {
+			game.context.strokeStyle = t.strokeStyle
+			game.context.strokeText(letter,t.x + index*t.dX,t.y + t.dY*(index-t.items.length/2)*Math.sin( (t.c+index*3)*(game.deg2rad) ) );
+		}
+		
+	})
+
+	t.c++;
+}
