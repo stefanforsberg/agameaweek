@@ -68,9 +68,7 @@ game.init = function() {
 	var scale = Math.min(window.innerWidth/game.canvas.width,window.innerHeight/game.canvas.height);
 	game.canvas.setAttribute('style', style + ' ' + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; -o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');');
 
-	game.texts = [];
-	game.texts.push(new text(110,200,46, 8, "GAME OVER", "40px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
-	game.texts.push(new text(80,300,18, 2, "Press any key to try again", "14px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+	
 
 	window.requestAnimationFrame(game.draw);
 }
@@ -86,6 +84,7 @@ game.draw = function() {
 			
 			game.backgrounds.draw();
 			game.enemies.draw();
+			
 			game.explosions.draw();
 			game.status.draw();
 			game.level.update();
@@ -107,8 +106,13 @@ game.draw = function() {
 			drawText(t);
 		})
 		game.context.restore();
-		
-		
+	} else if(game.boss.dying) {	
+		game.backgrounds.draw();
+		game.player.draw();
+		game.enemies.draw();
+		game.explosions.draw();
+		game.status.draw();
+		game.level.update();
 	} else {
 
 		if(game.boss.entering) {
@@ -396,6 +400,9 @@ game.player = {
 	},
 	death: function() {
 		game.dying = true;
+		game.texts = [];
+	game.texts.push(new text(110,200,46, 8, "GAME OVER", "40px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+	game.texts.push(new text(80,300,18, 2, "Press any key to try again", "14px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
 		game.sounds[0].play("death");
 		game.sounds[2].stop();
 		game.explosions.add(game.player.x+16, game.player.y+16, 100);

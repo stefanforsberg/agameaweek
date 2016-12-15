@@ -10,7 +10,8 @@ game.boss = {
         this.phase = 0;
         this.dirY = -1;
         this.level = 0;
-        this.totalHealth = 100;
+        this.totalHealth = 3;
+        this.dying = 0;
 
     },
     start: function() {
@@ -135,7 +136,6 @@ game.boss = {
             }
 
             if(this.phase % 360 === 0) {
-                console.log("changing dir")
                 this.dirY = this.dirY*-1;
             }
 
@@ -193,6 +193,49 @@ game.boss = {
             
             this.main.health-= 1;
             
+            if(this.totalHealth <= 0 && !this.dying) {
+
+
+                var x = this.x;
+                var y = this.y
+
+                window.setTimeout(function() {
+                    game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                    game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                    game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                    game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                    game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                     window.setTimeout(function() {
+                        game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                        game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                        game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                        game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                        game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                        window.setTimeout(function() {
+                            game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                            game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                            game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                            game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                            game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                            window.setTimeout(function() {
+                                game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                                game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                                game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                                game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+                                game.explosions.add(x+Math.random()*128, y+Math.random()*128, 40);
+
+                                game.texts = [];
+                                game.texts.push(new text(110,200,46, 8, "WELL DONE", "40px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+                                game.texts.push(new text(80,300,18, 2, "Press any key to try again", "14px 'Press Start 2P'", "rgba(255,255,255,0.8)"));
+                                this.dying = true;
+                                game.dying = true;
+                                game.explosions.add(this.x+Math.random()*128, this.y+Math.random()*128, 40);
+
+                            }, 60);
+                        }, 60);
+                     }, 60);
+                }, 60)
+            }
 
             if(this.main.health <= 0) {
                 if(this.level === 0) {
@@ -209,7 +252,7 @@ game.boss = {
                     game.enemies.add(this.electricalDefence);
                     this.main.health = 100;
                     this.level++;
-                }
+                } 
 
             }
             s.remove = true;
