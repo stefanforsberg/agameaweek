@@ -10,7 +10,7 @@ game.boss = {
         this.phase = 0;
         this.dirY = -1;
         this.level = 0;
-        this.totalHealth = 3;
+        this.totalHealth = 100;
         this.dying = 0;
 
     },
