@@ -7,8 +7,17 @@ game.deg2rad = Math.PI/180;
 game.running = false;
 game.dying = false;
 game.dyingCounter = 0;
+game.playingSong = false;
 
 game.load = function() {
+
+	var style = game.canvas.getAttribute('style') || '';
+	var scale = Math.min(window.innerWidth/game.canvas.width,window.innerHeight/game.canvas.height)*0.8;
+	game.canvas.setAttribute('style', style + ' ' + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; -o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');');
+
+	game.context.font = "40px 'Press Start 2P'";
+	game.context.fillStyle = "#ffffff"
+	game.context.fillText("Loading",170,100);
 
 	game.sounds = [];
 	game.sounds[0] = new Howl({
@@ -31,18 +40,28 @@ game.load = function() {
 						urls: ['boss_song.mp3'], 
 						loop: true,
 						onload: function() {
-							game.init();
+							game.sounds[3] = new Howl({
+								urls: ['song.mp3'], 
+								loop: true,
+								onload: function() {
+									game.init();
+								}
+							})
 						}
 					})
 				}
 			})
 		}		  			
 	});
-
 	
 }
 
 game.init = function() {
+
+	if(!game.playingSong) {
+		game.sounds[3].play();
+		game.playingSong = true;
+	}
 
 	if(game.requestId) {
 		console.log("running, cancelling animation frame")
@@ -64,9 +83,6 @@ game.init = function() {
 	game.dying = false;
 	game.pos = 0;
 
-	var style = game.canvas.getAttribute('style') || '';
-	var scale = Math.min(window.innerWidth/game.canvas.width,window.innerHeight/game.canvas.height);
-	game.canvas.setAttribute('style', style + ' ' + '-ms-transform-origin: center top; -webkit-transform-origin: center top; -moz-transform-origin: center top; -o-transform-origin: center top; transform-origin: center top; -ms-transform: scale(' + scale + '); -webkit-transform: scale3d(' + scale + ', 1); -moz-transform: scale(' + scale + '); -o-transform: scale(' + scale + '); transform: scale(' + scale + ');');
 
 	
 

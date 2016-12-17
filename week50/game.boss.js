@@ -20,6 +20,8 @@ game.boss = {
         this.electricalDefence = new game.enemies.electrical(650, 203, 60, game.enemies.electricalImg, false, true)
         game.enemies.add(this.electricalDefence);
         game.sounds[1].play();
+        game.sounds[3].stop()
+		game.playingSong = false;
     },
     draw: function() {
 
