@@ -21,7 +21,7 @@ game.load = function() {
 
 	game.sounds = [];
 	game.sounds[0] = new Howl({
-		urls: ['SFX.mp3'],
+		urls: ['sfx.mp3'],
 		volume: 0.5,
 		sprite: {
 	    	laser: [0, 200],
